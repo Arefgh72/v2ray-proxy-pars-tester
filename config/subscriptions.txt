@@ -4,8 +4,8 @@
 # ---------------------------------------------------
 
 # SoroushMirzaei Links (Corrected)
-https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collection/main/security/non-tls
-https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collection/main/security/tls
+https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/non-tls
+https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/tls
 
 # PlanAsli Link (Corrected)
 https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/main/sub/protocols/vless.txt
