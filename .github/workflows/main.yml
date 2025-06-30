@@ -54,8 +54,9 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add -f output/  # تمام فایل‌های داخل پوشه output را اضافه می‌کند (-f برای force add است)
-          git add -f error.log test_summary.log # لاگ‌ها اگر در روت باشند
+          # این دستور به تنهایی کافی است چون تمام فایل‌های داخل output را اضافه می‌کند
+          # (شامل پروکسی‌ها و لاگ‌ها)
+          git add -f output/
           # چک می‌کند که آیا تغییری برای کامیت وجود دارد یا نه
           if git diff --staged --quiet; then
             echo "No changes to commit."
