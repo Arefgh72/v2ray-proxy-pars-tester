@@ -11,15 +11,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        # ما به یک توکن دسترسی شخصی نیاز داریم تا بتوانیم pull و push را با هم انجام دهیم
-        # این توکن به صورت خودکار توسط گیت‌هاب ساخته و استفاده می‌شود
         uses: actions/checkout@v4
-        with:
-          # این خط اطمینان می‌دهد که ما با اطلاعات کامل گیت کار می‌کنیم
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,7 +23,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests
+          # --- تغییر اینجاست: نصب کتابخانه‌های جدید ---
+          pip install "curl_cffi>=0.5.5" brotli
 
       - name: Run Fetch Proxies Script
         run: python -u scripts/01_fetch_proxies.py
@@ -39,21 +34,11 @@ jobs:
       
       - name: Commit and push results
         run: |
+          git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # --- تغییرات اصلی اینجا هستند ---
-          # 1. آخرین تغییرات را از ریپازیتوری می‌گیریم
-          # استراتژی "ours" در صورت وجود تداخل، تغییرات محلی ما را در اولویت قرار می‌دهد
-          git pull origin main --strategy=ours
-          
-          # 2. فایل‌ها را برای کامیت اضافه می‌کنیم
           git add -f output/
-          
-          # 3. کامیت و پوش می‌کنیم
           if ! git diff --staged --quiet; then
-            echo "Changes found, committing..."
-            git commit -m "✅ Update proxy lists | $(date -u)"
+            git commit -m "Update proxy lists and logs"
             git push
           else
             echo "No changes to commit."
