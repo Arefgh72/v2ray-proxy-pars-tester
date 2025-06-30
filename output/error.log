@@ -49,3 +49,36 @@
 [2025-06-30 18:20:25] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:91.193.5...]
   Details: Port could not be cast to integer value as ':ffff:91.193.58.48:8880'
 ------------------------------------------------------------
+[2025-06-30 19:21:52] [Stage: Fetch Proxies (Other)] [Error: An unexpected error with link: https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: string argument should contain only ASCII characters
+------------------------------------------------------------
+[2025-06-30 19:21:52] [Stage: Fetch Proxies (Other)] [Error: An unexpected error with link: https://raw.githubusercontent.com/Arefgh72/v2ray-proxy-pars-tester/main/output/github_all.txt]
+  Details: string argument should contain only ASCII characters
+------------------------------------------------------------
+[2025-06-30 19:21:52] [Stage: Fetch Proxies (Other)] [Error: An unexpected error with link: https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/All_Configs_Sub.txt]
+  Details: string argument should contain only ASCII characters
+------------------------------------------------------------
+[2025-06-30 19:21:52] [Stage: Fetch Proxies (Other)] [Error: An unexpected error with link: https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub1.txt]
+  Details: string argument should contain only ASCII characters
+------------------------------------------------------------
+[2025-06-30 19:21:53] [Stage: Fetch Proxies (Other)] [Error: An unexpected error with link: https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub2.txt]
+  Details: string argument should contain only ASCII characters
+------------------------------------------------------------
+[2025-06-30 19:21:53] [Stage: Fetch Proxies (Other)] [Error: An unexpected error with link: https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub3.txt]
+  Details: string argument should contain only ASCII characters
+------------------------------------------------------------
+[2025-06-30 19:23:46] [Stage: Smart Parser] [Error: Failed for proxy: ss://45ce6f5fd81c414286cad87e5ba1f61a@172.67.39.142:80#🔒 SS-...]
+  Details: 'utf-8' codec can't decode bytes in position 0-1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 19:24:13] [Stage: Smart Parser] [Error: Failed for proxy: ss://45ce6f5fd81c414286cad87e5ba1f61a@104.22.28.114:80#🔒 SS-...]
+  Details: 'utf-8' codec can't decode bytes in position 0-1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 19:25:04] [Stage: Smart Parser] [Error: Failed for proxy: ss://45ce6f5fd81c414286cad87e5ba1f61a@104.22.29.114:80#🔒 SS-...]
+  Details: 'utf-8' codec can't decode bytes in position 0-1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 19:33:43] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:91.193.5...]
+  Details: Port could not be cast to integer value as ':ffff:91.193.58.48:8880'
+------------------------------------------------------------
+[2025-06-30 19:33:43] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:91.193.5...]
+  Details: Port could not be cast to integer value as ':ffff:91.193.58.48:8880'
+------------------------------------------------------------
