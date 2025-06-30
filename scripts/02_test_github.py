@@ -22,6 +22,11 @@ TEST_URL = 'http://cp.cloudflare.com/'
 TIMEOUT_SECONDS = 10
 MAX_LATENCY_MS = 2000
 
+# --- متغیرهای سراسری برای نمایش پیشرفت ---
+total_proxies_to_test = 0
+tested_proxies_count = 0
+progress_lock = threading.Lock()
+
 def download_and_extract_xray():
     if os.path.exists(XRAY_EXECUTABLE_PATH):
         print("Xray executable already exists. Skipping download.")
@@ -58,16 +63,10 @@ def download_and_extract_xray():
         return False
 
 def create_xray_config(proxy_url: str, config_filename: str):
-    """
-    یک فایل کانفیگ موقت برای Xray ایجاد می‌کند.
-    این تابع از پروتکل‌های vmess, vless, trojan, و ss پشتیبانی می‌کند.
-    """
     try:
         parsed_url = urlparse(proxy_url)
         protocol = parsed_url.scheme
-        
         outbound_config = {"protocol": protocol, "settings": {}, "streamSettings": {}}
-        
         if protocol == "vmess":
             decoded_config = json.loads(base64.b64decode(parsed_url.netloc).decode('utf-8'))
             outbound_config["settings"]["vnext"] = [{"address": decoded_config.get("add"), "port": int(decoded_config.get("port")), "users": [{"id": decoded_config.get("id"), "alterId": int(decoded_config.get("aid")), "security": "auto"}]}]
@@ -75,55 +74,40 @@ def create_xray_config(proxy_url: str, config_filename: str):
             if stream_settings["network"] == "ws":
                 stream_settings["wsSettings"] = {"path": decoded_config.get("path", "/"), "headers": {"Host": decoded_config.get("host", "")}}
             outbound_config["streamSettings"] = stream_settings
-
         elif protocol == "vless" or protocol == "trojan":
             password = parsed_url.username
             address = parsed_url.hostname
             port = parsed_url.port
             params = parse_qs(parsed_url.query)
-            
-            # VLESS و Trojan ساختار مشابهی دارند
             server_field = "vnext" if protocol == "vless" else "servers"
             user_field = "users" if protocol == "vless" else "password"
             user_value = [{"id": password, "flow": params.get("flow", [None])[0]}] if protocol == "vless" else password
-            
             outbound_config["settings"][server_field] = [{"address": address, "port": port, user_field: user_value}]
-            
             stream_settings = {"network": params.get("type", ["tcp"])[0], "security": params.get("security", ["none"])[0]}
             if stream_settings["security"] == "tls":
                 stream_settings["tlsSettings"] = {"serverName": params.get("sni", [address])[0]}
             if stream_settings["network"] == "ws":
                 stream_settings["wsSettings"] = {"path": params.get("path", ["/"])[0], "headers": {"Host": params.get("host", [address])[0]}}
             outbound_config["streamSettings"] = stream_settings
-            
         elif protocol == "ss":
-            # فرمت: ss://method:password@server:port
-            # گاهی اوقات: ss://base64(method:password)@server:port
             user_info_raw = unquote(parsed_url.username or "")
-            if '@' in parsed_url.netloc: # حالت Base64
+            if '@' in parsed_url.netloc:
                 decoded_user_info = base64.b64decode(user_info_raw).decode('utf-8')
             else:
                 decoded_user_info = user_info_raw
-            
             method, password = decoded_user_info.split(':', 1)
             address = parsed_url.hostname
             port = parsed_url.port
-            
             outbound_config["settings"]["servers"] = [{"method": method, "password": password, "address": address, "port": port}]
-            # Shadowsocks معمولاً streamSettings خاصی ندارد مگر اینکه با پلاگین استفاده شود که اینجا ساده‌سازی شده است.
             outbound_config["streamSettings"] = {"network": "tcp"}
-
-        else: # پروتکل پشتیبانی نمی‌شود
+        else:
             return False
-
         config = {"inbounds": [{"port": XRAY_LOCAL_PORT, "protocol": "http", "settings": {"allowTransparent": False}}], "outbounds": [outbound_config]}
         with open(config_filename, 'w') as f:
             json.dump(config, f)
         return True
-
     except Exception:
         return False
-
 
 def test_proxy(proxy_url: str) -> int:
     thread_id = threading.get_ident()
@@ -151,33 +135,57 @@ def test_proxy(proxy_url: str) -> int:
             os.remove(config_filename)
 
 def worker(proxy_queue, results_list):
+    """
+    تابع کارگر که پروکسی‌ها را تست می‌کند و پیشرفت را گزارش می‌دهد.
+    """
+    global tested_proxies_count, total_proxies_to_test
+
     while not proxy_queue.empty():
         try:
             proxy = proxy_queue.get_nowait()
             latency = test_proxy(proxy)
             if 0 < latency < MAX_LATENCY_MS:
                 results_list.append({'proxy': proxy, 'latency': latency})
-                print(f"  SUCCESS | Latency: {latency:4d}ms | Proxy: {proxy[:40]}...")
+                # برای خلوت شدن لاگ، فقط پیام موفقیت را چاپ نمی‌کنیم مگر برای دیباگ
+                # print(f"  SUCCESS | Latency: {latency:4d}ms | Proxy: {proxy[:40]}...")
+
+            # --- بخش نمایش پیشرفت ---
+            with progress_lock:
+                tested_proxies_count += 1
+                # هر 100 پروکسی یک بار، یا برای 100 پروکسی اول هر 10 تا یک بار، پیشرفت را چاپ کن
+                if tested_proxies_count % 100 == 0 or (tested_proxies_count <= 100 and tested_proxies_count % 10 == 0):
+                    percentage = (tested_proxies_count / total_proxies_to_test) * 100
+                    print(f"  Progress: {tested_proxies_count}/{total_proxies_to_test} ({percentage:.2f}%) tested.")
+        
         except Exception:
-            pass
+            pass # خطاها را نادیده می‌گیریم تا ترد متوقف نشود
         finally:
             proxy_queue.task_done()
 
 def main():
+    global total_proxies_to_test
+    
     print("\n--- Running 02_test_github.py ---")
     if not download_and_extract_xray():
         sys.exit(1)
     try:
         with open(RAW_PROXIES_FILE, 'r') as f:
             proxies = [line.strip() for line in f if line.strip()]
-        print(f"Found {len(proxies)} proxies in '{RAW_PROXIES_FILE}' to test.")
+        total_proxies_to_test = len(proxies) # مقداردهی اولیه متغیر سراسری
+        print(f"Found {total_proxies_to_test} proxies in '{RAW_PROXIES_FILE}' to test.")
     except FileNotFoundError:
         log_error("GitHub Test", f"'{RAW_PROXIES_FILE}' not found. Run 01_fetch_proxies.py first.")
         return
+    
+    if total_proxies_to_test == 0:
+        print("No proxies to test. Exiting.")
+        return
+        
     from queue import Queue
     proxy_queue = Queue()
     for p in proxies:
         proxy_queue.put(p)
+    
     results = []
     threads = []
     num_threads = 50
@@ -187,23 +195,30 @@ def main():
         t.daemon = True
         t.start()
         threads.append(t)
+    
     proxy_queue.join()
+    print(f"\nFinal Progress: {tested_proxies_count}/{total_proxies_to_test} (100.00%) tested.")
     print("\nTest finished.")
     print(f"Found {len(results)} working proxies.")
     if not results:
         print("No working proxies found. Exiting.")
         return
+        
     sorted_results = sorted(results, key=lambda x: x['latency'])
     sorted_proxies = [item['proxy'] for item in sorted_results]
+    
     print("Saving results...")
     with open(OUTPUT_ALL_FILE, 'w') as f: f.write('\n'.join(sorted_proxies))
     print(f"  -> Saved {len(sorted_proxies)} proxies to '{OUTPUT_ALL_FILE}'")
+    
     top_500 = sorted_proxies[:500]
     with open(OUTPUT_TOP_500_FILE, 'w') as f: f.write('\n'.join(top_500))
     print(f"  -> Saved {len(top_500)} proxies to '{OUTPUT_TOP_500_FILE}'")
+    
     top_100 = sorted_proxies[:100]
     with open(OUTPUT_TOP_100_FILE, 'w') as f: f.write('\n'.join(top_100))
     print(f"  -> Saved {len(top_100)} proxies to '{OUTPUT_TOP_100_FILE}'")
+    
     print("--- Finished 02_test_github.py ---")
 
 if __name__ == "__main__":
