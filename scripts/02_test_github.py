@@ -18,7 +18,7 @@ OUTPUT_TOP_100_FILE = 'output/github_top_100.txt'
 
 XRAY_EXECUTABLE_PATH = './xray'
 XRAY_LOCAL_PORT = 10808
-TEST_URL = 'http://cp.cloudflare.com/'
+TEST_URL = 'https://www.youtube.com/'
 TIMEOUT_SECONDS = 25
 MAX_LATENCY_MS = 3000
 
