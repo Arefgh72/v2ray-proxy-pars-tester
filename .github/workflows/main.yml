@@ -1,0 +1,65 @@
+# نام Workflow که در تب Actions گیت‌هاب نمایش داده می‌شود
+name: V2Ray Proxy Auto Tester
+
+on:
+  # این بخش مشخص می‌کند که Workflow در چه زمان‌هایی اجرا شود
+  schedule:
+    # "cron" یک فرمت استاندارد برای زمان‌بندی است. این کد یعنی "در دقیقه 0 هر ساعت"
+    # یعنی رأس هر ساعت (1:00, 2:00, 3:00, ...)
+    - cron: '0 * * * *'
+  
+  # این بخش به شما اجازه می‌دهد که Workflow را به صورت دستی از تب Actions اجرا کنید
+  workflow_dispatch:
+
+jobs:
+  # ما یک "job" (وظیفه) به نام "build" داریم که تمام مراحل را اجرا می‌کند
+  build:
+    # مشخص می‌کند که این وظیفه روی آخرین نسخه اوبونتو اجرا شود
+    runs-on: ubuntu-latest
+
+    steps:
+      # مرحله 1: دریافت کد ریپازیتوری
+      # این اکشن استاندارد گیت‌هاب، کد شما را از ریپازیتوری به ماشین مجازی اکشن می‌آورد
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # مرحله 2: نصب پایتون
+      # نسخه‌ای از پایتون را که اسکریپت‌های ما با آن سازگار هستند، نصب می‌کند
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # می‌توان از نسخه‌های دیگر مثل 3.9 یا 3.11 هم استفاده کرد
+      
+      # مرحله 3: نصب وابستگی‌ها
+      # کتابخانه‌های پایتون که اسکریپت‌های ما به آن‌ها نیاز دارند را با pip نصب می‌کند
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      # مرحله 4: اجرای اسکریپت اول (Fetch Proxies)
+      # این مرحله اسکریپت 01_fetch_proxies.py را برای جمع‌آوری پروکسی‌ها اجرا می‌کند
+      - name: Run Fetch Proxies Script
+        run: python scripts/01_fetch_proxies.py
+
+      # مرحله 5: اجرای اسکریپت دوم (Test Proxies on GitHub)
+      # این مرحله اسکریپت 02_test_github.py را برای تست پروکسی‌ها اجرا می‌کند
+      - name: Run GitHub Proxy Tester Script
+        run: python scripts/02_test_github.py
+      
+      # مرحله 6: کامیت و پوش کردن نتایج
+      # این بخش بسیار مهم است. بعد از اینکه فایل‌های خروجی در پوشه output ایجاد شدند،
+      # این مرحله آن‌ها را به ریپازیتوری شما کامیت و پوش می‌کند تا لینک‌های سابسکریپشن به‌روز شوند.
+      - name: Commit and push results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -f output/  # تمام فایل‌های داخل پوشه output را اضافه می‌کند (-f برای force add است)
+          git add -f error.log test_summary.log # لاگ‌ها اگر در روت باشند
+          # چک می‌کند که آیا تغییری برای کامیت وجود دارد یا نه
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update proxy lists and logs"
+            git push
+          fi
