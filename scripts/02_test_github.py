@@ -12,6 +12,7 @@ from utils import log_error
 
 # --- تنظیمات ---
 RAW_PROXIES_FILE = 'output/raw_proxies.txt'
+# ... (بقیه تنظیمات مثل قبل)
 OUTPUT_ALL_FILE = 'output/github_all.txt'
 OUTPUT_TOP_500_FILE = 'output/github_top_500.txt'
 OUTPUT_TOP_100_FILE = 'output/github_top_100.txt'
@@ -22,14 +23,15 @@ TEST_URL = 'http://cp.cloudflare.com/'
 TIMEOUT_SECONDS = 10
 MAX_LATENCY_MS = 2000
 
-# --- متغیرهای سراسری برای نمایش پیشرفت ---
+# --- متغیرهای سراسری برای نمایش پیشرفت (فقط شمارنده‌ها) ---
 total_proxies_to_test = 0
 tested_proxies_count = 0
-progress_lock = threading.Lock()
+# قفل از اینجا حذف شد
 
+# ... (توابع download_and_extract_xray و create_xray_config و test_proxy مثل قبل بدون تغییر باقی می‌مانند)
 def download_and_extract_xray():
     if os.path.exists(XRAY_EXECUTABLE_PATH):
-        print("Xray executable already exists. Skipping download.")
+        # print("Xray executable already exists. Skipping download.")
         return True
     print("Downloading Xray-core...")
     try:
@@ -134,10 +136,9 @@ def test_proxy(proxy_url: str) -> int:
         if os.path.exists(config_filename):
             os.remove(config_filename)
 
-def worker(proxy_queue, results_list):
-    """
-    تابع کارگر که پروکسی‌ها را تست می‌کند و پیشرفت را گزارش می‌دهد.
-    """
+
+# تابع worker حالا یک آرگومان جدید برای قفل می‌گیرد
+def worker(proxy_queue, results_list, progress_lock):
     global tested_proxies_count, total_proxies_to_test
 
     while not proxy_queue.empty():
@@ -146,32 +147,29 @@ def worker(proxy_queue, results_list):
             latency = test_proxy(proxy)
             if 0 < latency < MAX_LATENCY_MS:
                 results_list.append({'proxy': proxy, 'latency': latency})
-                # برای خلوت شدن لاگ، فقط پیام موفقیت را چاپ نمی‌کنیم مگر برای دیباگ
-                # print(f"  SUCCESS | Latency: {latency:4d}ms | Proxy: {proxy[:40]}...")
 
-            # --- بخش نمایش پیشرفت ---
             with progress_lock:
                 tested_proxies_count += 1
-                # هر 100 پروکسی یک بار، یا برای 100 پروکسی اول هر 10 تا یک بار، پیشرفت را چاپ کن
-                if tested_proxies_count % 100 == 0 or (tested_proxies_count <= 100 and tested_proxies_count % 10 == 0):
+                if tested_proxies_count % 100 == 0 or (total_proxies_to_test <= 200 and tested_proxies_count % 10 == 0):
                     percentage = (tested_proxies_count / total_proxies_to_test) * 100
                     print(f"  Progress: {tested_proxies_count}/{total_proxies_to_test} ({percentage:.2f}%) tested.")
         
         except Exception:
-            pass # خطاها را نادیده می‌گیریم تا ترد متوقف نشود
+            pass
         finally:
             proxy_queue.task_done()
 
 def main():
     global total_proxies_to_test
     
-    print("\n--- Running 02_test_github.py ---")
+    print("\n--- Running 02_test_github.py ---") # این اولین خروجی خواهد بود
+    
     if not download_and_extract_xray():
         sys.exit(1)
     try:
         with open(RAW_PROXIES_FILE, 'r') as f:
             proxies = [line.strip() for line in f if line.strip()]
-        total_proxies_to_test = len(proxies) # مقداردهی اولیه متغیر سراسری
+        total_proxies_to_test = len(proxies)
         print(f"Found {total_proxies_to_test} proxies in '{RAW_PROXIES_FILE}' to test.")
     except FileNotFoundError:
         log_error("GitHub Test", f"'{RAW_PROXIES_FILE}' not found. Run 01_fetch_proxies.py first.")
@@ -189,15 +187,22 @@ def main():
     results = []
     threads = []
     num_threads = 50
+    progress_lock = threading.Lock() # <-- قفل اینجا ایجاد می‌شود
+
     print(f"Starting test with {num_threads} threads...")
     for _ in range(num_threads):
-        t = threading.Thread(target=worker, args=(proxy_queue, results))
+        # قفل به عنوان آرگومان به تابع worker پاس داده می‌شود
+        t = threading.Thread(target=worker, args=(proxy_queue, results, progress_lock))
         t.daemon = True
         t.start()
         threads.append(t)
     
     proxy_queue.join()
-    print(f"\nFinal Progress: {tested_proxies_count}/{total_proxies_to_test} (100.00%) tested.")
+    
+    # اطمینان از چاپ آخرین گزارش پیشرفت
+    if total_proxies_to_test > 0:
+        print(f"\nFinal Progress: {tested_proxies_count}/{total_proxies_to_test} (100.00%) tested.")
+
     print("\nTest finished.")
     print(f"Found {len(results)} working proxies.")
     if not results:
