@@ -1,0 +1,33 @@
+[2025-06-30 17:26:08] [Stage: Fetch Proxies (Decoding)] [Error: Failed to decode content from link: https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/refs/heads/main/sub/protocols/vless.txt#vless]
+  Details: 'utf-8' codec can't decode byte 0xb6 in position 0: invalid start byte
+------------------------------------------------------------
+[2025-06-30 17:26:23] [Stage: Config Creation] [Error: Failed to parse proxy: vmess://eyJzY3kiOiAiYXV0byIsICJwcyI6ICJcdWQ4M2RcdWRkMTIgVk0t...]
+  Details: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+------------------------------------------------------------
+[2025-06-30 17:27:06] [Stage: Config Creation] [Error: Failed to parse proxy: vmess://eyJwb3J0IjogIjkwMDciLCAidHlwZSI6ICJodHRwIiwgInNjeSI6...]
+  Details: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+------------------------------------------------------------
+[2025-06-30 17:27:24] [Stage: Config Creation] [Error: Failed to parse proxy: vmess://eyJwb3J0IjogIjkwMDciLCAidHlwZSI6ICJodHRwIiwgInNjeSI6...]
+  Details: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+------------------------------------------------------------
+[2025-06-30 17:27:35] [Stage: Config Creation] [Error: Failed to parse proxy: vmess://eyJwb3J0IjogIjkwMDciLCAidHlwZSI6ICJodHRwIiwgInNjeSI6...]
+  Details: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+------------------------------------------------------------
+[2025-06-30 17:28:09] [Stage: Config Creation] [Error: Failed to parse proxy: ss://45ce6f5fd81c414286cad87e5ba1f61a@104.22.29.114:80#🔒 SS-...]
+  Details: 'utf-8' codec can't decode bytes in position 0-1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 17:28:20] [Stage: Config Creation] [Error: Failed to parse proxy: vmess://eyJwb3J0IjogIjkwMDciLCAidHlwZSI6ICJodHRwIiwgInNjeSI6...]
+  Details: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+------------------------------------------------------------
+[2025-06-30 17:28:31] [Stage: Config Creation] [Error: Failed to parse proxy: ss://45ce6f5fd81c414286cad87e5ba1f61a@104.22.28.114:80#🔒 SS-...]
+  Details: 'utf-8' codec can't decode bytes in position 0-1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 17:28:58] [Stage: Config Creation] [Error: Failed to parse proxy: ss://45ce6f5fd81c414286cad87e5ba1f61a@172.67.39.142:80#🔒 SS-...]
+  Details: 'utf-8' codec can't decode bytes in position 0-1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 17:35:15] [Stage: Config Creation] [Error: Failed to parse proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:91.193.5...]
+  Details: Port could not be cast to integer value as ':ffff:91.193.58.48:8880'
+------------------------------------------------------------
+[2025-06-30 17:35:15] [Stage: Config Creation] [Error: Failed to parse proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:91.193.5...]
+  Details: Port could not be cast to integer value as ':ffff:91.193.58.48:8880'
+------------------------------------------------------------
