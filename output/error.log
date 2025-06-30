@@ -82,3 +82,882 @@
 [2025-06-30 19:33:43] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:91.193.5...]
   Details: Port could not be cast to integer value as ':ffff:91.193.58.48:8880'
 ------------------------------------------------------------
+[2025-06-30 19:47:38] [Stage: Smart Parser] [Error: Failed for proxy: ss://45ce6f5fd81c414286cad87e5ba1f61a@104.22.28.114:80#🔒 SS-...]
+  Details: UnicodeDecodeError: 'utf-8' codec can't decode bytes in position 0-1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 19:48:35] [Stage: Smart Parser] [Error: Failed for proxy: ss://45ce6f5fd81c414286cad87e5ba1f61a@104.22.29.114:80#🔒 SS-...]
+  Details: UnicodeDecodeError: 'utf-8' codec can't decode bytes in position 0-1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 19:48:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://45ce6f5fd81c414286cad87e5ba1f61a@172.67.39.142:80#🔒 SS-...]
+  Details: UnicodeDecodeError: 'utf-8' codec can't decode bytes in position 0-1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 19:55:44] [Stage: Smart Parser] [Error: Failed for proxy: vless://b60197fb-413d-4702-83a8-1dfcebf0d746@2a01:4f8:c013:2...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:c013:2d33::1:443'
+------------------------------------------------------------
+[2025-06-30 19:55:45] [Stage: Smart Parser] [Error: Failed for proxy: vless://Parsashonam-251@2a01:4f8:1c1b:e1d0::1:8888?type=tcp&...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:e1d0::1:8888'
+------------------------------------------------------------
+[2025-06-30 19:55:45] [Stage: Smart Parser] [Error: Failed for proxy: vless://d7f927c1-c100-4da7-ba48-f41652bc99be@2a01:4f8:1c1b:e...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:e235::1:58404'
+------------------------------------------------------------
+[2025-06-30 19:55:46] [Stage: Smart Parser] [Error: Failed for proxy: vless://%54%45%4C%45%47%52%41%4D%2D%53%65%72%76%65%72%4E%65%...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:2411::1:31086'
+------------------------------------------------------------
+[2025-06-30 19:55:47] [Stage: Smart Parser] [Error: Failed for proxy: vless://%54%45%4C%45%47%52%41%4D%2D%53%65%72%76%65%72%4E%65%...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:1051::1:21614'
+------------------------------------------------------------
+[2025-06-30 19:55:47] [Stage: Smart Parser] [Error: Failed for proxy: vless://%54%45%4C%45%47%52%41%4D%2D%53%65%72%76%65%72%4E%65%...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:247d::1:31579'
+------------------------------------------------------------
+[2025-06-30 19:55:48] [Stage: Smart Parser] [Error: Failed for proxy: vless://dcf6aba6-df8e-451c-a9a6-f3684845494d@2a01:4f8:c010:5...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:c010:5c29::1:2095'
+------------------------------------------------------------
+[2025-06-30 19:55:48] [Stage: Smart Parser] [Error: Failed for proxy: vless://TELEGRAM-ServerNett@2a01:4f8:1c1b:1aa0::1:30237?type...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:1aa0::1:30237'
+------------------------------------------------------------
+[2025-06-30 19:55:51] [Stage: Smart Parser] [Error: Failed for proxy: vless://09324ee6-1235-4793-bf9b-0da17a466a69@0000:0000:0000:...]
+  Details: ValueError: Port could not be cast to integer value as '0000:0000:0000:0000:ffff:5b63:9012:20600'
+------------------------------------------------------------
+[2025-06-30 19:55:52] [Stage: Smart Parser] [Error: Failed for proxy: vless://764a13da-76a5-4bc0-a2c9-e2a02f62408f@2a01:4f8:1c1b:7...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:7df::1:443'
+------------------------------------------------------------
+[2025-06-30 19:55:53] [Stage: Smart Parser] [Error: Failed for proxy: vless://fcbae65d-739f-40fb-847c-67a862ecb746@2a01:4f8:c2c:e5...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:c2c:e57e::1:443'
+------------------------------------------------------------
+[2025-06-30 19:55:57] [Stage: Smart Parser] [Error: Failed for proxy: vless://3091880b-13e7-4c1f-8211-f2a79428671d@2a01:4f8:1c1b:1...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:11e::1:20000'
+------------------------------------------------------------
+[2025-06-30 19:55:58] [Stage: Smart Parser] [Error: Failed for proxy: vless://3b88b30b-6586-412b-a4a5-a8c2aa53f66f@2a01:4f8:1c1b:1...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:1891::1:443'
+------------------------------------------------------------
+[2025-06-30 19:55:58] [Stage: Smart Parser] [Error: Failed for proxy: vless://7814b29c-92c0-4bf4-8025-bc76a5c048af@2a01:4f8:1c1b:2...]
+  Details: ValueError: Port could not be cast to integer value as '4f8:1c1b:25a3::1:443'
+------------------------------------------------------------
+[2025-06-30 19:55:59] [Stage: Smart Parser] [Error: Failed for proxy: vless://11710a27-cc86-45c1-90b0-6f05b69565a9@::ffff:159.69.3...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:159.69.31.165:20484'
+------------------------------------------------------------
+[2025-06-30 19:55:59] [Stage: Smart Parser] [Error: Failed for proxy: vless://0816aff6-9396-40e4-b686-22598b65cce6@::ffff:128.140....]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:128.140.84.193:20304'
+------------------------------------------------------------
+[2025-06-30 19:55:59] [Stage: Smart Parser] [Error: Failed for proxy: vless://40abc17b-b527-4163-9bc5-30615b0592a0@::ffff:5.75.204...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:5.75.204.51:34782'
+------------------------------------------------------------
+[2025-06-30 19:56:57] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:91.193.5...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:91.193.58.48:8880'
+------------------------------------------------------------
+[2025-06-30 19:57:23] [Stage: Smart Parser] [Error: Failed for proxy: vless://e3133685-3ecc-4c2e-86cc-2f65bedca783@2a00:15c8:1061:...]
+  Details: ValueError: Port could not be cast to integer value as '15c8:1061::79:47162'
+------------------------------------------------------------
+[2025-06-30 19:57:45] [Stage: Smart Parser] [Error: Failed for proxy: vless://13baf8e7-b432-4e51-b174-aa08ab42119c@0000:0000:0000:...]
+  Details: ValueError: Port could not be cast to integer value as '0000:0000:0000:0000:ffff:b94f:9e97:8051'
+------------------------------------------------------------
+[2025-06-30 19:57:45] [Stage: Smart Parser] [Error: Failed for proxy: vless://13baf8e7-b432-4e51-b174-aa08ab42119c@0:0:0:0:0:ffff:...]
+  Details: ValueError: Port could not be cast to integer value as '0:0:0:0:ffff:b94f:9e97:8051'
+------------------------------------------------------------
+[2025-06-30 19:57:45] [Stage: Smart Parser] [Error: Failed for proxy: vless://13baf8e7-b432-4e51-b174-aa08ab42119c@::ffff:b94f:9e9...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:b94f:9e97:8051'
+------------------------------------------------------------
+[2025-06-30 19:58:17] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:156.238....]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:156.238.18.136:8880'
+------------------------------------------------------------
+[2025-06-30 19:58:17] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:156.238....]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:156.238.18.66:8880'
+------------------------------------------------------------
+[2025-06-30 19:58:18] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:156.238....]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:156.238.18.252:8880'
+------------------------------------------------------------
+[2025-06-30 19:58:18] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:156.238....]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:156.238.18.177:8880'
+------------------------------------------------------------
+[2025-06-30 19:59:23] [Stage: Smart Parser] [Error: Failed for proxy: vless://94064b6e-df7a-4803-a7fc-a8bb9cfcaf3b@0000:0000:0000:...]
+  Details: ValueError: Port could not be cast to integer value as '0000:0000:0000:0000:ffff:171b:18f1:80'
+------------------------------------------------------------
+[2025-06-30 19:59:29] [Stage: Smart Parser] [Error: Failed for proxy: vless://35eaae35-6a9e-4b92-aa9a-1aa0c175fbf3@0000:0000:0000:...]
+  Details: ValueError: Port could not be cast to integer value as '0000:0000:0000:0000:ffff:5275:57c8:443'
+------------------------------------------------------------
+[2025-06-30 19:59:38] [Stage: Smart Parser] [Error: Failed for proxy: vless://7c9e3c1d-a360-4429-9189-e45a98de7fde@::ffff:2d8e:780...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:2d8e:7808:443'
+------------------------------------------------------------
+[2025-06-30 19:59:56] [Stage: Smart Parser] [Error: Failed for proxy: vless://b106570b-6b5f-40c1-8081-03093fbe8fa5@2a0b:4140:659a:...]
+  Details: ValueError: Port could not be cast to integer value as '4140:659a:6::6:33000'
+------------------------------------------------------------
+[2025-06-30 20:00:34] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:8ca0:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:8ca0::3dc4:21a2:443'
+------------------------------------------------------------
+[2025-06-30 20:01:27] [Stage: Smart Parser] [Error: Failed for proxy: vless://bbff4bb6-f503-4082-ab7c-c44f4190d602@2a04:4e42:600::...]
+  Details: ValueError: Port could not be cast to integer value as '4e42:600::731:80'
+------------------------------------------------------------
+[2025-06-30 20:01:27] [Stage: Smart Parser] [Error: Failed for proxy: vless://bbff4bb6-f503-4082-ab7c-c44f4190d602@2a04:4e42::731:...]
+  Details: ValueError: Port could not be cast to integer value as '4e42::731:80'
+------------------------------------------------------------
+[2025-06-30 20:01:27] [Stage: Smart Parser] [Error: Failed for proxy: vless://310b0dea-3a54-4e14-9392-db0bbd150dc2@2a04:4e42:200::...]
+  Details: ValueError: Port could not be cast to integer value as '4e42:200::731:443'
+------------------------------------------------------------
+[2025-06-30 20:01:27] [Stage: Smart Parser] [Error: Failed for proxy: vless://53503fd1-275c-4623-d426-601a652ca3fc@2a04:4e42:400::...]
+  Details: ValueError: Port could not be cast to integer value as '4e42:400::740:80'
+------------------------------------------------------------
+[2025-06-30 20:01:27] [Stage: Smart Parser] [Error: Failed for proxy: vless://ae22c3c8-b7b6-46e0-aed9-80b95810eff6@2a04:4e42:400::...]
+  Details: ValueError: Port could not be cast to integer value as '4e42:400::731:80'
+------------------------------------------------------------
+[2025-06-30 20:01:27] [Stage: Smart Parser] [Error: Failed for proxy: vless://9b20814f-0e5e-43e6-bdfa-51849a95e5f7@2a04:4e42:600::...]
+  Details: ValueError: Port could not be cast to integer value as '4e42:600::740:80'
+------------------------------------------------------------
+[2025-06-30 20:01:27] [Stage: Smart Parser] [Error: Failed for proxy: vless://53503fd1-275c-4623-d426-601a652ca3fc@2a04:4e42::740:...]
+  Details: ValueError: Port could not be cast to integer value as '4e42::740:80'
+------------------------------------------------------------
+[2025-06-30 20:01:27] [Stage: Smart Parser] [Error: Failed for proxy: vless://9b20814f-0e5e-43e6-bdfa-51849a95e5f7@2a04:4e42:200::...]
+  Details: ValueError: Port could not be cast to integer value as '4e42:200::740:80'
+------------------------------------------------------------
+[2025-06-30 20:01:31] [Stage: Smart Parser] [Error: Failed for proxy: vless://827545b9-5e1d-4e29-a97f-46b388891f57@::ffff:3207:55d...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:3207:55dc:80'
+------------------------------------------------------------
+[2025-06-30 20:01:58] [Stage: Smart Parser] [Error: Failed for proxy: vless://71775278-cf12-4318-a22d-84b579e23da6@2402:800:6117:5...]
+  Details: ValueError: Port could not be cast to integer value as '800:6117:5a38::dfb:65534'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c39a:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2ccb:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700::6810...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6810:8eed:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:486f:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:21c9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://7a80a8d9-92f9-4f0a-8352-9005a8215ab8@2606:4700:20::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::ac43:44f0:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://d03d2ff3-0b28-4c6b-bab5-4bfac274aa91@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:d1f:8080'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://76ad8213-4617-47eb-92cc-5392b39b45ce@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:e55:80'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://0fbf4f81-2598-4b6a-a623-0ead4cb9efa8@2606:4700:10::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::ac43:17f7:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c190:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23ca:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3a8:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://13e26f64-2e0c-4461-92cd-d83294cc18f0@2606:4700:3033:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3033::6815:5e45:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2cca:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::6815:3001:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::6815:1001:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3031:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3031::6815:1581:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2ccf:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3032:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3032::818:669e:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:ade:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23bc:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:24f3:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://76ad8213-4617-47eb-92cc-5392b39b45ce@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:f55:80'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4b33b482-25bc-49e4-b866-878c914d945a@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::ac43:9b8c:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:2190:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://d342d11e-d424-4583-b36e-524ab1f0afa4@2606:4700:3009:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3009:0:4e:e810:eb51:7d2d:8443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2c6e:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://462a6b0c-059e-497e-9404-21747f3080fc@2606:4700:3036:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3036::6815:265a:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700::6810...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6810:8fed:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:10::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::ac43:155d:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://07a3df8f-2a2c-42f8-ad92-65889d90f3bf@2606:4700:3032:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3032::ac43:85f8:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://f898ffcb-6417-4373-9640-0b66091e8206@2606:4700:3033:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3033::6815:169f:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2ca1:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2cbb:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:224:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:324:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://0fbf4f81-2598-4b6a-a623-0ead4cb9efa8@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:1ac1:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c39b:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::6815:7001:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2c94:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://0343e230-5132-4e98-844e-b42ad1a6a273@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:e84:8443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2cad:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://2404f667-5969-4883-a71a-ea2e0db2d25b@2606:4700::6813...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6813:df4f:2096'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4fe84736-3189-4843-a5a1-3c0a7effc425@2606:4700:3032:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3032::6815:4256:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3cd:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4e4768df-0fbb-4cc1-8fd3-7c6fea95742a@2606:4700:20::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::ac43:42b1:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://12ccd36e-cb59-41d4-ad10-332700a34bc0@2606:4700:3034:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3034::6815:4fbc:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3d1:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4fe84736-3189-4843-a5a1-3c0a7effc425@2606:4700:3033:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3033::6815:3571:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4e4768df-0fbb-4cc1-8fd3-7c6fea95742a@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::6818:c414:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://0fbf4f81-2598-4b6a-a623-0ead4cb9efa8@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:99a:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://11dd4a95-fd4f-4f08-8def-e950aa2c1766@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::ac43:95ca:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://509ed9b7-8d64-4204-8ec8-6b749020ac3f@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::ac43:831b:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4b33b482-25bc-49e4-b866-878c914d945a@2606:4700:3035:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3035::6815:793:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2c9a:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://7a80a8d9-92f9-4f0a-8352-9005a8215ab8@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:7d6:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:3120:...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:3120::5692:61a4:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c1c9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://13e26f64-2e0c-4461-92cd-d83294cc18f0@2606:4700:3034:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3034::ac43:dc8c:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://31332c0d-8638-44af-885d-709ad24dd4a5@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::6815:334:8080'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://30602b6d-5d5c-4f56-9b65-9ae2fd9348cb@2606:4700:3034:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3034::ac43:d14f:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:4400:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:4400::ac40:9242:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::ac43:a168:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:bde:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::6815:6001:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4fe84736-3189-4843-a5a1-3c0a7effc425@2606:4700:3033:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3033::ac43:cd83:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://c8eac4b7-95ba-4ce0-920d-c3279eb3b391@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::ac43:d5a6:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3bc:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23a9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:10::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::ac43:1eab:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2cd9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4e4768df-0fbb-4cc1-8fd3-7c6fea95742a@2606:4700::6810...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6810:291c:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:4400:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:4400::6812:29be:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23c7:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700::6810...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6810:1576:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://0343e230-5132-4e98-844e-b42ad1a6a273@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:f84:8443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c353:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://07a3df8f-2a2c-42f8-ad92-65889d90f3bf@2606:4700:3035:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3035::6815:195f:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::ac43:c6cb:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://7db421d8-cee2-4d7b-8eb1-1307efb25a07@2606:4700:20::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::ac43:49a3:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://e9b4bdbd-cc5b-4a90-9616-ea0f1092ec7c@2606:4700:3034:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3034::6815:3958:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23c0:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://215a97cc-3c09-4aa1-937a-4c0194110ef5@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::ac43:94d3:2052'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23d9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://6d4bc80d-ca8f-43b7-a0e6-1655631f8860@2606:4700:3033:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3033::ac43:8242:8080'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3c2:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://c8eac4b7-95ba-4ce0-920d-c3279eb3b391@2606:4700:3031:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3031::6815:17d2:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2cc2:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://7a80a8d9-92f9-4f0a-8352-9005a8215ab8@2606:4700::6813...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6813:ad44:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3031:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3031::6815:5ad2:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://d03d2ff3-0b28-4c6b-bab5-4bfac274aa91@2606:4700:20::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::ac43:4bac:8080'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:496f:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://7248e825-887c-48b9-83bc-c26bc6392bf8@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::ac43:d615:80'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:25f3:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2cc7:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3a9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c39f:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2cbc:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::ac43:46bf:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://d03d2ff3-0b28-4c6b-bab5-4bfac274aa91@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:c1f:8080'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://e4cbe8b8-37db-4aaa-8469-b84f34c51ebc@2606:4700:3035:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3035::ac43:a232:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3cb:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2c9b:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4e4768df-0fbb-4cc1-8fd3-7c6fea95742a@2606:4700::6810...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6810:281c:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2c87:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23cb:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3d9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4e4768df-0fbb-4cc1-8fd3-7c6fea95742a@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::6818:c514:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::adf5:3b90:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::6815:5001:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://a7c9c017-db10-4d15-b01b-0634db498b57@2606:4700:3034:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3034::6815:4c15:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://215a97cc-3c09-4aa1-937a-4c0194110ef5@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::6815:3fab:2052'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:2394:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:239b:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://509ed9b7-8d64-4204-8ec8-6b749020ac3f@2606:4700:3033:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3033::6815:3bd:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://11dd4a95-fd4f-4f08-8def-e950aa2c1766@2606:4700:3035:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3035::6815:1dcd:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://fc264e2f-753b-43fd-878c-c8f82b4bc502@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:466a:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2cd1:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://30602b6d-5d5c-4f56-9b65-9ae2fd9348cb@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::6815:4d95:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2ca8:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://6757b7d6-fa32-4708-b5d1-30e3cf928b51@2606:4700:3031:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3031::ac43:8717:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:e7::3...]
+  Details: ValueError: Port could not be cast to integer value as '4700:e7::3151:47a9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4e4768df-0fbb-4cc1-8fd3-7c6fea95742a@2606:4700::6812...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6812:9c77:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:216e:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::ac43:4812:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ce921385-2b31-45fe-84c5-1843e8ae845b@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::ac43:bfae:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://c8eac4b7-95ba-4ce0-920d-c3279eb3b391@2606:4700:3034:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3034::6815:4ef3:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://0fbf4f81-2598-4b6a-a623-0ead4cb9efa8@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:1bc1:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://a7c9c017-db10-4d15-b01b-0634db498b57@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::ac43:c5a5:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23cf:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:d17:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::6815:2001:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://53bea386-912e-4fe3-9eff-59c2285a176c@2606:4700:3036:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3036::ac43:cc18:2053'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:c17:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2c53:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4e4768df-0fbb-4cc1-8fd3-7c6fea95742a@2606:4700::6812...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6812:9b77:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2ccd:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:236e:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://7a80a8d9-92f9-4f0a-8352-9005a8215ab8@2606:4700::6812...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6812:c95:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c36e:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://462a6b0c-059e-497e-9404-21747f3080fc@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::ac43:dcd5:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700::6810...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6810:1476:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://fc264e2f-753b-43fd-878c-c8f82b4bc502@2606:4700:10::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::ac43:289e:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://cd2e9541-3fce-4d95-9bec-919d884f911e@2606:4700::6813...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6813:de4f:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700::6813...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6813:ae44:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23bb:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://a96cb093-b164-4bc6-bd27-deb0e385de07@2606:4700:3036:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3036::6815:2a5d:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://a96cb093-b164-4bc6-bd27-deb0e385de07@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::ac43:a077:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://0fbf4f81-2598-4b6a-a623-0ead4cb9efa8@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:89a:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23c2:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://e9b4bdbd-cc5b-4a90-9616-ea0f1092ec7c@2606:4700:3035:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3035::ac43:a24a:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://e4cbe8b8-37db-4aaa-8469-b84f34c51ebc@2606:4700:3035:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3035::6815:5ae2:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4fe84736-3189-4843-a5a1-3c0a7effc425@2606:4700:3035:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3035::ac43:d43b:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:725:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://0fbf4f81-2598-4b6a-a623-0ead4cb9efa8@2606:4700:10::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::ac43:14cd:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3035:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3035::1a4f:5642:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::adf5:3bc9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3c0:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23ad:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3ad:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://7248e825-887c-48b9-83bc-c26bc6392bf8@2606:4700:3032:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3032::6815:2afa:80'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:625:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::ac43:4581:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://a7c9c017-db10-4d15-b01b-0634db498b57@2606:4700:3036:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3036::6815:d24:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2c9f:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://0343e230-5132-4e98-844e-b42ad1a6a273@2606:4700:10::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::ac43:54e:8443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://a7c9c017-db10-4d15-b01b-0634db498b57@2606:4700:3033:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3033::ac43:b96b:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2cc0:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::adf5:3b6e:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23a1:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://92976645-6532-4a0c-aead-15af4e51878c@2606:4700:3009:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3009:c727:3a29:97a:507:4916:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://c8eac4b7-95ba-4ce0-920d-c3279eb3b391@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::ac43:8abb:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://53bea386-912e-4fe3-9eff-59c2285a176c@2606:4700:3034:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3034::6815:34d3:2053'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c394:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3ca:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3c7:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3cf:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ce921385-2b31-45fe-84c5-1843e8ae845b@2606:4700:3037:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3037::6815:444c:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3030:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3030::6815:4001:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3a1:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c387:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:20::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::ac43:4664:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:2353:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://12ccd36e-cb59-41d4-ad10-332700a34bc0@2606:4700:3032:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3032::ac43:931b:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c16e:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:58::a...]
+  Details: ValueError: Port could not be cast to integer value as '4700:58::a29f:2ca9:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2803:f800:50::6...]
+  Details: ValueError: Port could not be cast to integer value as 'f800:50::6ca2:c3bb:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://53bea386-912e-4fe3-9eff-59c2285a176c@2606:4700::6812...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6812:1587:2053'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:2387:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23cd:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://53bea386-912e-4fe3-9eff-59c2285a176c@2606:4700::6812...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6812:1487:2053'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://6757b7d6-fa32-4708-b5d1-30e3cf928b51@2606:4700:3031:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3031::6815:6b3:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://ee6774c0-9b19-4ff1-8b30-2da4b71977e2@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23a8:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://fc264e2f-753b-43fd-878c-c8f82b4bc502@2606:4700:10::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:10::6816:476a:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://7a80a8d9-92f9-4f0a-8352-9005a8215ab8@2606:4700::6812...]
+  Details: ValueError: Port could not be cast to integer value as '4700::6812:d95:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://7a80a8d9-92f9-4f0a-8352-9005a8215ab8@2606:4700:20::6...]
+  Details: ValueError: Port could not be cast to integer value as '4700:20::681a:6d6:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:239f:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:239a:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://4fe84736-3189-4843-a5a1-3c0a7effc425@2606:4700:3034:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3034::ac43:9dfe:443'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://d342d11e-d424-4583-b36e-524ab1f0afa4@2606:4700:3009:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3009:139a:286e:40fe:fb0d:7cf0:8080'
+------------------------------------------------------------
+[2025-06-30 20:04:54] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2a06:98c1:50::a...]
+  Details: ValueError: Port could not be cast to integer value as '98c1:50::ac40:23d1:443'
+------------------------------------------------------------
+[2025-06-30 20:04:55] [Stage: Smart Parser] [Error: Failed for proxy: vless://0f8691e2-c289-481b-9dcb-7a4578eab343@2606:4700:310c:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:310c::ac42:2f98:8443'
+------------------------------------------------------------
+[2025-06-30 20:04:55] [Stage: Smart Parser] [Error: Failed for proxy: vless://0f8691e2-c289-481b-9dcb-7a4578eab343@2606:4700:310c:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:310c::ac42:2c68:8443'
+------------------------------------------------------------
+[2025-06-30 20:05:06] [Stage: Smart Parser] [Error: Failed for proxy: vless://d342d11e-d424-4583-b36e-524ab1f0afa4@::ffff:104.22.6...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:104.22.68.66:2053'
+------------------------------------------------------------
+[2025-06-30 20:05:15] [Stage: Smart Parser] [Error: Failed for proxy: vless://d342d11e-d424-4583-b36e-524ab1f0afa4@::ffff:104.17.1...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:104.17.110.12:443'
+------------------------------------------------------------
+[2025-06-30 20:05:26] [Stage: Smart Parser] [Error: Failed for proxy: vless://d342d11e-d424-4583-b36e-524ab1f0afa4@::ffff:104.18.1...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:104.18.186.83:443'
+------------------------------------------------------------
+[2025-06-30 20:05:42] [Stage: Smart Parser] [Error: Failed for proxy: vless://06e4425e-a8cb-4b63-929f-2105604ab0a9@2606:4700:3036:...]
+  Details: ValueError: Port could not be cast to integer value as '4700:3036:0:a36a:4a94:8d40:c92c:443'
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://eyJhZGQiOiJodHRwczovL2dpdGh1Yi5jb20vQUxJSUxBUFJPL3YycmF...]
+  Details: ValueError: not enough values to unpack (expected 2, got 1)
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://ccff34b1-44fd-478d-bc0e-5111cb11f5be@129.80.237.223:443...]
+  Details: UnicodeDecodeError: 'utf-8' codec can't decode byte 0xc7 in position 1: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://telegram-id-directvpn@15.236.162.49:22223?security=tls&...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://2fec7227-9abe-46f2-af18-78302b836c45@199.34.228.169:443...]
+  Details: UnicodeDecodeError: 'utf-8' codec can't decode byte 0xd9 in position 0: invalid continuation byte
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://355d36aa-9ac0-4865-9f51-df2a0a506e64@premium.vkehi.shop...]
+  Details: UnicodeDecodeError: 'utf-8' codec can't decode byte 0x9a in position 5: invalid start byte
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpvWEdwMStpaGxmS2c4MjZIQDI...]
+  Details: ValueError: not enough values to unpack (expected 2, got 1)
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpvWklvQTY5UTh5aGNRVjhrYTN...]
+  Details: ValueError: not enough values to unpack (expected 2, got 1)
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: vmess://ewogICJ2IjogMiwKICAicHMiOiAiVk1FU1Mt5Yqg5ou/5aSnLU5G...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpES3lSZG9xUUllYmRLWlZZczV...]
+  Details: ValueError: not enough values to unpack (expected 2, got 1)
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpMaUhRWDljRGJkb29CSGxJZzB...]
+  Details: ValueError: not enough values to unpack (expected 2, got 1)
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpvWEdwMStpaGxmS2c4MjZIQDE...]
+  Details: ValueError: not enough values to unpack (expected 2, got 1)
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpWcEtBQmNPcE5OQTBsNUcyQVZ...]
+  Details: ValueError: not enough values to unpack (expected 2, got 1)
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1nY206V0hUU042VU9PODRUM1JWSQ@ti3hyra4.slashde...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1nY206ZHd6MUd0Rjc@120.233.128.98:30015#%F0%9F...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw@156.146.40.194:9...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:47] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1jZmI6cXdlclJFV1FAQA@125.141.31.72:15098#2%20...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1jZmI6eWlqaWFuMDUwMw@43.203.249.172:443#tg%E9...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://cmM0LW1kNTplZmFuY2N5dW4@cn01.efan8867801.xyz:8766#%F0%9...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTphYzlkZjdhYWI1OTU@137.220...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1nY206UVpWRk5HWlk4MjUzTFpZUA@ti3hyra4.slashde...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1nY206TU5PT1JJVktSUUY0S0dKUA@ti3hyra4.slashde...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1nY206V0hUU042VU9PODRUM1JWSQ@ti3hyra4.slashde...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1nY206MDREMkJINkRMN1pLVFhYVA@ti3hyra4.slashde...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1nY206TFJTWU5XRUlIUE40QkFWSA@8tv68qhq.slashde...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://cmM0LW1kNTplZmFuY2N5dW4@cn01.efan8867801.xyz:8774#%F0%9...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://YWVzLTI1Ni1jZmI6ZjhmN2FDemNQS2JzRjhwMw@103.163.218.2:98...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://c3M6Ly9ZV1Z6TFRJMU5pMWpabUk2ZVdscWFXRnVNRFV3TXc@43.203....]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://c3M6Ly9ZV1Z6TFRJMU5pMW5ZMjA2VVZwV1JrNUhXbGs0TWpVelRGcFp...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://c3M6Ly9ZV1Z6TFRJMU5pMW5ZMjA2VFU1UFQxSkpWa3RTVVVZMFMwZEt...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://c3M6Ly9ZV1Z6TFRJMU5pMW5ZMjA2VjBoVVUwNDJWVTlQT0RSVU0xSld...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://c3M6Ly9ZV1Z6TFRJMU5pMW5ZMjA2TURSRU1rSklOa1JNTjFwTFZGaFl...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://c3M6Ly9ZV1Z6TFRJMU5pMW5ZMjA2VEZKVFdVNVhSVWxJVUU0MFFrRld...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://c3M6Ly9ZV1Z6TFRJMU5pMWpabUk2WmpobU4yRkRlbU5RUzJKelJqaHd...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTphYzlkZjdhYWI1OTU@137.220...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://cmM0LW1kNTplZmFuY2N5dW4@cn01.efan8867801.xyz:8766/?plug...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:05:48] [Stage: Smart Parser] [Error: Failed for proxy: ss://cmM0LW1kNTplZmFuY2N5dW4@cn01.efan8867801.xyz:8774/?plug...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:08:19] [Stage: Smart Parser] [Error: Failed for proxy: vmess://eyJ2IjogIjIiLCAicHMiOiAi8J+Hr/Cfh7UxIHwgIDEuOE1CL3N8...]
+  Details: Error: Invalid base64-encoded string: number of data characters (29) cannot be 1 more than a multiple of 4
+------------------------------------------------------------
+[2025-06-30 20:08:53] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:91.193.5...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:91.193.58.48:8880'
+------------------------------------------------------------
+[2025-06-30 20:08:53] [Stage: Smart Parser] [Error: Failed for proxy: vless://fab7bf9c-ddb9-4563-8a04-fb01ce6c0fbf@::ffff:91.193.5...]
+  Details: ValueError: Port could not be cast to integer value as ':ffff:91.193.58.48:8880'
+------------------------------------------------------------
+[2025-06-30 20:09:00] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTphYzlkZjdhYWI1OTU@137.220...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:09:00] [Stage: Smart Parser] [Error: Failed for proxy: ss://cmM0LW1kNTplZmFuY2N5dW4@cn01.efan8867801.xyz:8766?plugi...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
+[2025-06-30 20:09:00] [Stage: Smart Parser] [Error: Failed for proxy: ss://cmM0LW1kNTplZmFuY2N5dW4@cn01.efan8867801.xyz:8774?plugi...]
+  Details: Error: Incorrect padding
+------------------------------------------------------------
