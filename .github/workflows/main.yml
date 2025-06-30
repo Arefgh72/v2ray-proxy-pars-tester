@@ -28,7 +28,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # می‌توان از نسخه‌های دیگر مثل 3.9 یا 3.11 هم استفاده کرد
+          python-version: '3.10'
       
       # مرحله 3: نصب وابستگی‌ها
       # کتابخانه‌های پایتون که اسکریپت‌های ما به آن‌ها نیاز دارند را با pip نصب می‌کند
@@ -38,24 +38,22 @@ jobs:
           pip install requests
 
       # مرحله 4: اجرای اسکریپت اول (Fetch Proxies)
-      # این مرحله اسکریپت 01_fetch_proxies.py را برای جمع‌آوری پروکسی‌ها اجرا می‌کند
+      # آپشن -u به پایتون می‌گوید خروجی را بافر نکند و بلافاصله چاپ کند
       - name: Run Fetch Proxies Script
-        run: python scripts/01_fetch_proxies.py
+        run: python -u scripts/01_fetch_proxies.py
 
       # مرحله 5: اجرای اسکریپت دوم (Test Proxies on GitHub)
-      # این مرحله اسکریپت 02_test_github.py را برای تست پروکسی‌ها اجرا می‌کند
+      # آپشن -u برای این اسکریپت هم استفاده شده تا گزارش پیشرفت به صورت زنده نمایش داده شود
       - name: Run GitHub Proxy Tester Script
-        run: python scripts/02_test_github.py
+        run: python -u scripts/02_test_github.py
       
       # مرحله 6: کامیت و پوش کردن نتایج
-      # این بخش بسیار مهم است. بعد از اینکه فایل‌های خروجی در پوشه output ایجاد شدند،
-      # این مرحله آن‌ها را به ریپازیتوری شما کامیت و پوش می‌کند تا لینک‌های سابسکریپشن به‌روز شوند.
+      # این بخش نتایج نهایی را به ریپازیتوری شما کامیت و پوش می‌کند
       - name: Commit and push results
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          # این دستور به تنهایی کافی است چون تمام فایل‌های داخل output را اضافه می‌کند
-          # (شامل پروکسی‌ها و لاگ‌ها)
+          # تمام فایل‌های داخل پوشه output را برای کامیت آماده می‌کند
           git add -f output/
           # چک می‌کند که آیا تغییری برای کامیت وجود دارد یا نه
           if git diff --staged --quiet; then
