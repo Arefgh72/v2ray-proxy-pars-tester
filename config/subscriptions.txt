@@ -1,7 +1,4 @@
 # ---------------------------------------------------
-#  Standardized Subscription Links by Gemini
-#  Last Updated: 2025-06-30
-# ---------------------------------------------------
 
 https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/non-tls
 https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/tls
