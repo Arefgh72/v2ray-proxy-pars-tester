@@ -3,17 +3,10 @@
 #  Last Updated: 2025-06-30
 # ---------------------------------------------------
 
-# SoroushMirzaei Links (Corrected)
 https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/non-tls
 https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/tls
-
-# PlanAsli Link (Corrected)
 https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/main/sub/protocols/vless.txt
-
-# Your Own Repository Link (Corrected)
 https://raw.githubusercontent.com/Arefgh72/v2ray-proxy-pars-tester/main/output/github_all.txt
-
-# Epodonios Links (Corrected)
 https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/All_Configs_Sub.txt
 https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/vless.txt
 https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Sub1.txt
