@@ -1,56 +1,48 @@
-# نام Workflow که در تب Actions گیت‌هاب نمایش داده می‌شود
+# نام Workflow
 name: V2Ray Proxy Auto Tester
 
 on:
-  # این بخش مشخص می‌کند که Workflow در چه زمان‌هایی اجرا شود
   schedule:
-    # "cron" یک فرمت استاندارد برای زمان‌بندی است. این کد یعنی "در دقیقه 0 هر ساعت"
-    # یعنی رأس هر ساعت (1:00, 2:00, 3:00, ...)
     - cron: '0 */3 * * *'
-  
-  # این بخش به شما اجازه می‌دهد که Workflow را به صورت دستی از تب Actions اجرا کنید
   workflow_dispatch:
 
-jobs:
-  # ما یک "job" (وظیفه) به نام "build" داریم که تمام مراحل را اجرا می‌کند
-  build:
-    # مشخص می‌کند که این وظیفه روی آخرین نسخه اوبونتو اجرا شود
-    runs-on: ubuntu-latest
+# --- تغییر اصلی اینجاست ---
+# اضافه کردن این بخش برای دادن مجوزهای لازم به job
+permissions:
+  contents: write  # به job اجازه می‌دهد که در محتوای ریپازیتوری بنویسد (کامیت و پوش کند)
 
+jobs:
+  build:
+    runs-on: ubuntu-latest
     steps:
-      # مرحله 1: دریافت کد ریپازیتوری
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # مرحله 2: نصب پایتون
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       
-      # مرحله 3: نصب وابستگی‌ها
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests
 
-      # مرحله 4: اجرای اسکریپت اول (Fetch Proxies)
       - name: Run Fetch Proxies Script
         run: python -u scripts/01_fetch_proxies.py
 
-      # مرحله 5: اجرای اسکریپت دوم (Test Proxies on GitHub)
       - name: Run GitHub Proxy Tester Script
         run: python -u scripts/02_test_github.py
       
-      # مرحله 6: کامیت و پوش کردن نتایج
       - name: Commit and push results
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -f output/
-          if git diff --staged --quiet; then
-            echo "No changes to commit."
-          else
+          # اگر تغییری وجود داشت، کامیت کن
+          if ! git diff --staged --quiet; then
             git commit -m "Update proxy lists and logs"
             git push
+          else
+            echo "No changes to commit."
           fi
