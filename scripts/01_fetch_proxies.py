@@ -1,9 +1,10 @@
+# استفاده از کتابخانه curl_cffi به جای requests برای جعل هویت مرورگر
+from curl_cffi import requests
 import base64
-import requests
 import os
 from utils import log_error
 
-# --- تنظیمات ---
+# مسیر فایل‌های ورودی و خروجی
 SUBSCRIPTIONS_FILE_PATH = 'config/subscriptions.txt'
 RAW_PROXIES_OUTPUT_PATH = 'output/raw_proxies.txt'
 
@@ -20,74 +21,70 @@ def get_subscription_links():
         log_error("Fetch Proxies", f"Subscription file not found: '{SUBSCRIPTIONS_FILE_PATH}'.")
         return []
     except Exception as e:
-        log_error("Fetch Proxies", "Error reading subscription links.", str(e))
+        log_error("Fetch Proxies", "Error reading subscription links.", f"{type(e).__name__}: {e}")
         return []
 
 def fetch_and_decode_link(link: str) -> list[str]:
     """
-    محتوای یک لینک سابسکریپشن را دریافت می‌کند.
-    ابتدا تلاش می‌کند با Base64 دیکد کند، اگر نشد به عنوان متن ساده در نظر می‌گیرد.
+    محتوای یک لینک را با جعل هویت مرورگر Chrome دریافت کرده و پردازش می‌کند.
     """
+    # حذف بخش # از انتهای URL
+    clean_link = link.split('#')[0].strip()
     try:
-        print(f"Fetching: {link[:70]}...")
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/119.0'}
-        response = requests.get(link, timeout=20, headers=headers)
+        print(f"Fetching: {clean_link[:80]}...")
+        
+        # ارسال درخواست با جعل هویت مرورگر کروم نسخه 110
+        response = requests.get(clean_link, impersonate="chrome110", timeout=25)
         response.raise_for_status()
         
         content = response.text
         proxies = []
 
+        # تلاش برای دیکد کردن محتوا به عنوان Base64
         try:
-            # تلاش اول: دیکد کردن با Base64
             decoded_content = base64.b64decode(content).decode('utf-8')
             proxies = decoded_content.splitlines()
             print(f"  -> Decoded as Base64.")
-        except (base64.binascii.Error, UnicodeDecodeError):
-            # اگر دیکد Base64 شکست خورد، محتوا را به عنوان متن ساده در نظر بگیر
+        # اگر شکست خورد، آن را به عنوان متن ساده پردازش کن
+        except Exception:
             proxies = content.splitlines()
-            print(f"  -> Could not decode as Base64, processing as Plain Text.")
+            print(f"  -> Processed as Plain Text.")
 
         # فیلتر کردن نهایی برای اطمینان از فرمت صحیح پروکسی‌ها
         valid_proxies = [p.strip() for p in proxies if p.strip().startswith(('vmess://', 'vless://', 'trojan://', 'ss://'))]
         print(f"  -> Found {len(valid_proxies)} valid proxies.")
         return valid_proxies
 
-    except requests.exceptions.RequestException as e:
-        log_error("Fetch Proxies (Network)", f"Failed to fetch from link: {link}", str(e))
-        return []
     except Exception as e:
-        log_error("Fetch Proxies (Other)", f"An unexpected error with link: {link}", str(e))
+        # ثبت خطای دقیق‌تر در صورت بروز مشکل در شبکه یا درخواست
+        log_error("Fetch Proxies (Network)", f"Failed to fetch from link: {clean_link}", f"{type(e).__name__}: {e}")
         return []
 
 def main():
     """
-    تابع اصلی برای اجرای کامل فرآیند استخراج پروکسی‌ها.
+    تابع اصلی برای اجرای کامل فرآیند.
     """
-    print("--- Running 01_fetch_proxies.py ---")
+    print("--- Running 01_fetch_proxies.py (Impersonating Chrome) ---")
     os.makedirs('output', exist_ok=True)
-
+    
     subscription_links = get_subscription_links()
     if not subscription_links:
         print("No subscription links found. Exiting.")
-        with open(RAW_PROXIES_OUTPUT_PATH, 'w') as f: f.write('')
         return
 
     all_proxies = []
     for link in subscription_links:
-        proxies_from_link = fetch_and_decode_link(link)
-        all_proxies.extend(proxies_from_link)
+        all_proxies.extend(fetch_and_decode_link(link))
 
+    # حذف پروکسی‌های تکراری
     unique_proxies = list(dict.fromkeys(all_proxies))
     print(f"\nTotal unique proxies fetched: {len(unique_proxies)}")
 
-    try:
-        with open(RAW_PROXIES_OUTPUT_PATH, 'w', encoding='utf-8') as f:
-            for proxy in unique_proxies:
-                f.write(proxy + '\n')
-        print(f"Successfully saved {len(unique_proxies)} unique proxies to '{RAW_PROXIES_OUTPUT_PATH}'.")
-    except Exception as e:
-        log_error("Save Raw Proxies", f"Failed to save proxies to '{RAW_PROXIES_OUTPUT_PATH}'.", str(e))
-
+    # ذخیره نتایج
+    with open(RAW_PROXIES_OUTPUT_PATH, 'w', encoding='utf-8') as f:
+        for proxy in unique_proxies:
+            f.write(proxy + '\n')
+    print(f"Successfully saved {len(unique_proxies)} proxies to '{RAW_PROXIES_OUTPUT_PATH}'.")
     print("--- Finished 01_fetch_proxies.py ---")
 
 if __name__ == "__main__":
