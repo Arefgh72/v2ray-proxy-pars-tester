@@ -5,3 +5,5 @@ https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main
 https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/refs/heads/main/sub/protocols/vless.txt#vless
 https://github.com/Epodonios/v2ray-configs/raw/main/Splitted-By-Protocol/vless.txt#vless
 https://raw.githubusercontent.com/Arefgh72/v2ray-proxy-pars-tester/main/output/github_all.txt#github_all
+https://github.com/Epodonios/v2ray-configs/raw/main/All_Configs_Sub.txt
+https://github.com/Epodonios/v2ray-configs/raw/main/All_Configs_base64_Sub.txt
