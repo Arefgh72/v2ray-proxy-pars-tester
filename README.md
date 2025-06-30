@@ -10,7 +10,7 @@ This project uses a GitHub Action that runs automatically at scheduled intervals
 
 1.  **Fetch:** It fetches proxy configurations from a list of public V2Ray subscription links.
 2.  **Test (Global):** It performs an initial test on all collected proxies from GitHub's servers (located in the US/Europe). This filters out dead or unreachable proxies.
-3.  **Test (Iran-Optimized):** (Coming Soon) It will send the working proxies to a dedicated server inside Iran to perform real-world latency and speed tests.
+3.  **Test (Iran-Optimized):** (Coming Soon) (It is inactive) It will send the working proxies to a dedicated server inside Iran to perform real-world latency and speed tests.
 4.  **Sort & Publish:** It sorts the proxies based on performance and publishes them into several subscription links, ready for you to use.
 
 ---
@@ -43,19 +43,9 @@ These proxies are tested from GitHub's international servers. They are generally
 
 ---
 
-### 🇮🇷 Iran-Tested Proxies (Optimized for Iran) - COMING SOON
+### 🇮🇷 Iran-Tested Proxies (Optimized for Iran) - COMING SOON (It is inactive)
 
 These proxies will be tested from a server inside Iran for real-world performance. **These will be the recommended links for users in Iran once available.**
-
-*   **Top 500 Best Proxies (Iran)**
-    > ```
-    > https://raw.githubusercontent.com/Arefgh72/v2ray-proxy-pars-tester/main/output/iran_top_500.txt
-    > ```
-
-*   **Top 100 Best Proxies (Iran)**
-    > ```
-    > https://raw.githubusercontent.com/Arefgh72/v2ray-proxy-pars-tester/main/output/iran_top_100.txt
-    > ```
 
 ---
 
