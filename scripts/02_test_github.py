@@ -1,5 +1,6 @@
 import os
-import requests
+# --- تغییر اینجاست: استفاده از کتابخانه جدید ---
+from curl_cffi import requests
 import zipfile
 import subprocess
 import json
@@ -10,6 +11,7 @@ import base64
 from urllib.parse import urlparse, parse_qs, unquote
 from utils import log_error
 
+# ... (بقیه کد دقیقاً مثل قبل است و نیازی به تغییر ندارد) ...
 # --- تنظیمات ---
 RAW_PROXIES_FILE = 'output/raw_proxies.txt'
 OUTPUT_ALL_FILE = 'output/github_all.txt'
@@ -18,9 +20,9 @@ OUTPUT_TOP_100_FILE = 'output/github_top_100.txt'
 
 XRAY_EXECUTABLE_PATH = './xray'
 XRAY_LOCAL_PORT = 10808
-TEST_URL = 'https://www.youtube.com/'
+TEST_URL = 'https://www.youtube.com/' # استفاده از یوتیوب طبق خواسته شما
 TIMEOUT_SECONDS = 25
-MAX_LATENCY_MS = 3000
+MAX_LATENCY_MS = 4000 # افزایش آستانه به خاطر سنگین‌تر بودن تست یوتیوب
 
 total_proxies_to_test = 0
 tested_proxies_count = 0
@@ -29,15 +31,15 @@ tested_proxies_count = 0
 def download_and_extract_xray():
     """
     آخرین نسخه Xray-core برای لینوکس 64 بیتی را از گیت‌هاب دانلود و استخراج می‌کند.
-    این نسخه کامل و صحیح است.
     """
     if os.path.exists(XRAY_EXECUTABLE_PATH):
         return True
     
     print("Downloading Xray-core...")
     try:
+        # --- تغییر اینجاست: استفاده از کتابخانه جدید برای دانلود ---
         api_url = "https://api.github.com/repos/XTLS/Xray-core/releases/latest"
-        response = requests.get(api_url, timeout=20)
+        response = requests.get(api_url, impersonate="chrome110", timeout=20)
         response.raise_for_status()
         assets = response.json()['assets']
         
@@ -48,11 +50,11 @@ def download_and_extract_xray():
             return False
             
         print(f"Downloading from: {download_url}")
-        with requests.get(download_url, stream=True, timeout=60) as r:
-            r.raise_for_status()
-            with open("xray.zip", "wb") as f:
-                for chunk in r.iter_content(chunk_size=8192):
-                    f.write(chunk)
+        # برای دانلود فایل با این کتابخانه، stream=True پشتیبانی نمی‌شود، پس مستقیم دانلود می‌کنیم
+        response = requests.get(download_url, impersonate="chrome110", timeout=90)
+        response.raise_for_status()
+        with open("xray.zip", "wb") as f:
+            f.write(response.content)
                     
         print("Extracting Xray...")
         with zipfile.ZipFile("xray.zip", 'r') as zip_ref:
@@ -61,10 +63,10 @@ def download_and_extract_xray():
         os.chmod(XRAY_EXECUTABLE_PATH, 0o755)
         os.remove("xray.zip")
         print("Xray downloaded and extracted successfully.")
-        return True # <-- این خط در نسخه قبلی فراموش شده بود
+        return True
 
     except Exception as e:
-        log_error("Xray Download", "An error occurred during download or extraction.", str(e))
+        log_error("Xray Download", "An error occurred during download or extraction.", f"{type(e).__name__}: {e}")
         return False
 
 def parse_proxy_link_to_xray_outbound(proxy_url: str):
@@ -111,33 +113,38 @@ def parse_proxy_link_to_xray_outbound(proxy_url: str):
             return None
         return {"protocol": protocol, "settings": outbound_settings, "streamSettings": stream_settings}
     except Exception as e:
-        log_error("Smart Parser", f"Failed for proxy: {proxy_url[:60]}...", str(e))
+        log_error("Smart Parser", f"Failed for proxy: {proxy_url[:60]}...", f"{type(e).__name__}: {e}")
         return None
 
 def test_proxy(proxy_url: str) -> tuple[int, str]:
-    # ... (این تابع بدون تغییر باقی می‌ماند) ...
     thread_id = threading.get_ident()
     config_filename = f"temp_config_{thread_id}.json"
+    
     outbound_config = parse_proxy_link_to_xray_outbound(proxy_url)
     if not outbound_config:
         return -1, "CONFIG_FAILED"
+
     xray_config = {"inbounds": [{"port": XRAY_LOCAL_PORT, "protocol": "http"}], "outbounds": [outbound_config]}
     with open(config_filename, 'w') as f: json.dump(xray_config, f)
+
     process = None
     try:
         process = subprocess.Popen([XRAY_EXECUTABLE_PATH, "-config", config_filename], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(1.5)
         start_time = time.time()
+        # --- تغییر اینجاست: استفاده از کتابخانه جدید برای تست ---
         proxies = {"http": f"http://127.0.0.1:{XRAY_LOCAL_PORT}", "https": f"http://127.0.0.1:{XRAY_LOCAL_PORT}"}
-        response = requests.get(TEST_URL, proxies=proxies, timeout=TIMEOUT_SECONDS)
+        response = requests.get(TEST_URL, proxies=proxies, impersonate="chrome110", timeout=TIMEOUT_SECONDS)
         end_time = time.time()
+        
         if response.status_code == 200:
             return int((end_time - start_time) * 1000), "SUCCESS"
         else:
             return -1, f"HTTP_{response.status_code}"
-    except requests.exceptions.Timeout:
-        return -1, "TIMEOUT"
-    except requests.exceptions.RequestException:
+    except Exception as e:
+        # خطای تایم‌اوت در این کتابخانه نوع متفاوتی دارد
+        if "timed out" in str(e).lower():
+            return -1, "TIMEOUT"
         return -1, "CONN_ERROR"
     finally:
         if process: process.terminate(); process.wait()
