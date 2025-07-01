@@ -2,8 +2,8 @@
 name: Update Core Tools
 
 on:
-  # هر روز در ساعت 01:05 بامداد به وقت UTC اجرا شود
   schedule:
+    # هر روز در ساعت 01:05 بامداد UTC اجرا شود
     - cron: '5 1 * * *'
   
   # اجازه اجرای دستی از طریق تب Actions
@@ -29,7 +29,7 @@ jobs:
 
       # مرحله 3: آپدیت تستر Xray (هسته رسمی)
       - name: Update Xray-Core Tester
-        id: update_xray # به این مرحله یک id می‌دهیم تا بعداً از آن استفاده کنیم
+        id: update_xray
         run: |
           TOOL_NAME="xray-tester"
           REPO="XTLS/Xray-core"
@@ -46,17 +46,14 @@ jobs:
             echo "New version found! Downloading $LATEST_TAG..."
             DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/Xray-linux-64.zip"
             
-            # دانلود، از حالت فشرده خارج کردن و تغییر نام
             curl -L -o xray.zip "$DOWNLOAD_URL"
-            unzip -o xray.zip xray -d . # فقط فایل xray را استخراج کن
+            unzip -o xray.zip xray -d .
             mv xray "base/$TOOL_NAME"
             chmod +x "base/$TOOL_NAME"
             rm xray.zip
             
-            # ذخیره شماره نسخه جدید
             echo "$LATEST_TAG" > "$VERSION_FILE"
             echo "$TOOL_NAME has been updated to $LATEST_TAG"
-            # یک خروجی برای مرحله کامیت تنظیم می‌کنیم
             echo "updated=true" >> $GITHUB_OUTPUT
           else
             echo "$TOOL_NAME is up to date."
@@ -95,13 +92,15 @@ jobs:
 
       # مرحله 5: کامیت و پوش کردن تغییرات (فقط در صورت نیاز)
       - name: Commit and push updates
-        # این مرحله فقط در صورتی اجرا می‌شود که یکی از دو مرحله قبلی، خروجی updated=true را داده باشد
         if: steps.update_xray.outputs.updated == 'true' || steps.update_hysteria.outputs.updated == 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action (Tool Updater)"
-          # فقط فایل‌های داخل پوشه base را اضافه کن
           git add base/
           
           git commit -m "chore(base): Update core tools automatically"
           git push
+```---
+6.  تغییرات را ذخیره کنید (Commit changes).
+
+بعد از ذخیره این تغییر، لطفاً دوباره به تب Actions بروید و ورک‌فلو **"Update Core Tools"** را به صورت دستی اجرا کنید. این بار باید بدون خطای فوری اجرا شود و شما لاگ‌های مربوط به چک کردن نسخه و دانلود را مشاهده کنید.
