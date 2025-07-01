@@ -15499,3 +15499,9 @@
 [2025-07-01 21:36:10] [Stage: Smart Parser] [Error: Failed for proxy: ss://Y2hhY2hhMjA6djJrTkxZSkZ2YQ@5.188.36.6:4619#@Vip_Securit...]
   Details: Incorrect padding
 ------------------------------------------------------------
+[2025-07-01 23:25:41] [Stage: Xray Test] [Error: Xray tester failed.]
+  Details: flag provided but not defined: -url
+usage: xray run [-c config.json] [-confdir dir]
+Run 'xray help run' for details.
+
+------------------------------------------------------------
