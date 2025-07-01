@@ -1,0 +1,107 @@
+# نام ورک‌فلو: آپدیت کننده ابزارهای هسته
+name: Update Core Tools
+
+on:
+  # هر روز در ساعت 01:05 بامداد به وقت UTC اجرا شود
+  schedule:
+    - cron: '5 1 * * *'
+  
+  # اجازه اجرای دستی از طریق تب Actions
+  workflow_dispatch:
+
+# دادن مجوز نوشتن به این ورک‌فلو تا بتواند فایل‌ها را در ریپازیتوری کامیت کند
+permissions:
+  contents: write
+
+jobs:
+  # یک وظیفه به نام update برای انجام کل فرآیند
+  update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # مرحله 1: دریافت کد ریپازیتوری
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # مرحله 2: ساخت پوشه base در صورتی که وجود نداشته باشد
+      - name: Create base directory if not exists
+        run: mkdir -p base
+
+      # مرحله 3: آپدیت تستر Xray (هسته رسمی)
+      - name: Update Xray-Core Tester
+        id: update_xray # به این مرحله یک id می‌دهیم تا بعداً از آن استفاده کنیم
+        run: |
+          TOOL_NAME="xray-tester"
+          REPO="XTLS/Xray-core"
+          VERSION_FILE="base/$TOOL_NAME.version"
+          
+          echo "Checking for $TOOL_NAME updates..."
+          LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+          echo "Latest version on GitHub is: $LATEST_TAG"
+
+          CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
+          echo "Current local version is: $CURRENT_VERSION"
+          
+          if [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
+            echo "New version found! Downloading $LATEST_TAG..."
+            DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/Xray-linux-64.zip"
+            
+            # دانلود، از حالت فشرده خارج کردن و تغییر نام
+            curl -L -o xray.zip "$DOWNLOAD_URL"
+            unzip -o xray.zip xray -d . # فقط فایل xray را استخراج کن
+            mv xray "base/$TOOL_NAME"
+            chmod +x "base/$TOOL_NAME"
+            rm xray.zip
+            
+            # ذخیره شماره نسخه جدید
+            echo "$LATEST_TAG" > "$VERSION_FILE"
+            echo "$TOOL_NAME has been updated to $LATEST_TAG"
+            # یک خروجی برای مرحله کامیت تنظیم می‌کنیم
+            echo "updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "$TOOL_NAME is up to date."
+            echo "updated=false" >> $GITHUB_OUTPUT
+          fi
+
+      # مرحله 4: آپدیت کلاینت Hysteria 2
+      - name: Update Hysteria-Client
+        id: update_hysteria
+        run: |
+          TOOL_NAME="hysteria-client"
+          REPO="apernet/hysteria"
+          VERSION_FILE="base/$TOOL_NAME.version"
+          
+          echo "Checking for $TOOL_NAME updates..."
+          LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+          echo "Latest version on GitHub is: $LATEST_TAG"
+          
+          CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
+          echo "Current local version is: $CURRENT_VERSION"
+          
+          if [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
+            echo "New version found! Downloading $LATEST_TAG..."
+            DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/hysteria-linux-amd64"
+
+            curl -L -o "base/$TOOL_NAME" "$DOWNLOAD_URL"
+            chmod +x "base/$TOOL_NAME"
+            
+            echo "$LATEST_TAG" > "$VERSION_FILE"
+            echo "$TOOL_NAME has been updated to $LATEST_TAG"
+            echo "updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "$TOOL_NAME is up to date."
+            echo "updated=false" >> $GITHUB_OUTPUT
+          fi
+
+      # مرحله 5: کامیت و پوش کردن تغییرات (فقط در صورت نیاز)
+      - name: Commit and push updates
+        # این مرحله فقط در صورتی اجرا می‌شود که یکی از دو مرحله قبلی، خروجی updated=true را داده باشد
+        if: steps.update_xray.outputs.updated == 'true' || steps.update_hysteria.outputs.updated == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action (Tool Updater)"
+          # فقط فایل‌های داخل پوشه base را اضافه کن
+          git add base/
+          
+          git commit -m "chore(base): Update core tools automatically"
+          git push
