@@ -100,7 +100,3 @@ jobs:
           
           git commit -m "chore(base): Update core tools automatically"
           git push
-```---
-6.  تغییرات را ذخیره کنید (Commit changes).
-
-بعد از ذخیره این تغییر، لطفاً دوباره به تب Actions بروید و ورک‌فلو **"Update Core Tools"** را به صورت دستی اجرا کنید. این بار باید بدون خطای فوری اجرا شود و شما لاگ‌های مربوط به چک کردن نسخه و دانلود را مشاهده کنید.
