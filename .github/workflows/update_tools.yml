@@ -9,33 +9,29 @@ on:
   # اجازه اجرای دستی از طریق تب Actions
   workflow_dispatch:
 
-# دادن مجوز نوشتن به این ورک‌فلو تا بتواند فایل‌ها را در ریپازیتوری کامیت کند
 permissions:
   contents: write
 
 jobs:
-  # یک وظیفه به نام update برای انجام کل فرآیند
   update:
     runs-on: ubuntu-latest
     
     steps:
-      # مرحله 1: دریافت کد ریپازیتوری
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # مرحله 2: ساخت پوشه base در صورتی که وجود نداشته باشد
       - name: Create base directory if not exists
         run: mkdir -p base
 
-      # مرحله 3: آپدیت تستر Xray (هسته رسمی)
-      - name: Update Xray-Core Tester
+      # --- مرحله آپدیت تستر Xray (x-ray-ping) ---
+      - name: Update Xray-Tester (x-ray-ping)
         id: update_xray
         run: |
           TOOL_NAME="xray-tester"
-          REPO="XTLS/Xray-core"
+          REPO="William-An/x-ray-ping"
           VERSION_FILE="base/$TOOL_NAME.version"
           
-          echo "Checking for $TOOL_NAME updates..."
+          echo "Checking for $TOOL_NAME updates from $REPO..."
           LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
           echo "Latest version on GitHub is: $LATEST_TAG"
 
@@ -44,13 +40,14 @@ jobs:
           
           if [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
             echo "New version found! Downloading $LATEST_TAG..."
-            DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/Xray-linux-64.zip"
+            DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/x-ray-ping_linux_amd64.tar.gz"
             
-            curl -L -o xray.zip "$DOWNLOAD_URL"
-            unzip -o xray.zip xray -d .
-            mv xray "base/$TOOL_NAME"
+            # دانلود، از حالت فشرده خارج کردن و تغییر نام
+            curl -L -o tool.tar.gz "$DOWNLOAD_URL"
+            tar -xzf tool.tar.gz
+            mv x-ray-ping "base/$TOOL_NAME"
             chmod +x "base/$TOOL_NAME"
-            rm xray.zip
+            rm tool.tar.gz
             
             echo "$LATEST_TAG" > "$VERSION_FILE"
             echo "$TOOL_NAME has been updated to $LATEST_TAG"
@@ -60,7 +57,7 @@ jobs:
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
 
-      # مرحله 4: آپدیت کلاینت Hysteria 2
+      # --- مرحله آپدیت کلاینت Hysteria 2 ---
       - name: Update Hysteria-Client
         id: update_hysteria
         run: |
@@ -68,7 +65,7 @@ jobs:
           REPO="apernet/hysteria"
           VERSION_FILE="base/$TOOL_NAME.version"
           
-          echo "Checking for $TOOL_NAME updates..."
+          echo "Checking for $TOOL_NAME updates from $REPO..."
           LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
           echo "Latest version on GitHub is: $LATEST_TAG"
           
@@ -79,7 +76,7 @@ jobs:
             echo "New version found! Downloading $LATEST_TAG..."
             DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/hysteria-linux-amd64"
 
-            curl -L -o "base/$TOOL_NAME" "$DOWNLOAD_URL"
+            curl -L -f -o "base/$TOOL_NAME" "$DOWNLOAD_URL"
             chmod +x "base/$TOOL_NAME"
             
             echo "$LATEST_TAG" > "$VERSION_FILE"
@@ -90,7 +87,7 @@ jobs:
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
 
-      # مرحله 5: کامیت و پوش کردن تغییرات (فقط در صورت نیاز)
+      # --- مرحله کامیت کردن تغییرات ---
       - name: Commit and push updates
         if: steps.update_xray.outputs.updated == 'true' || steps.update_hysteria.outputs.updated == 'true'
         run: |
