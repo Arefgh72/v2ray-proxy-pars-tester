@@ -1,47 +1,62 @@
-# نام Workflow
+# نام ورک‌فلو اصلی: تست کننده پروکسی
 name: V2Ray Proxy Auto Tester
 
 on:
+  # هر 3 ساعت یکبار اجرا شود
   schedule:
     - cron: '0 */3 * * *'
+  
+  # اجازه اجرای دستی
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write # برای کامیت کردن نتایج تست
 
 jobs:
-  build:
+  test-and-commit:
     runs-on: ubuntu-latest
+    
     steps:
+      # مرحله 1: دریافت کد ریپازیتوری (شامل پوشه base با ابزارها)
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # مرحله 2: نصب پایتون
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       
-      # --- تغییر اصلی اینجاست ---
-      - name: Install dependencies
+      # مرحله 3: نصب وابستگی‌های پایتون
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          # نصب هر دو کتابخانه مورد نیاز
-          pip install requests curl_cffi
+          pip install requests curl_cffi # نصب هر دو برای اطمینان
 
+      # مرحله 4: دادن مجوز اجرایی به ابزارهای تست
+      - name: Make tools executable
+        run: chmod +x ./base/*
+
+      # مرحله 5: اجرای اسکریپت استخراج پروکسی
       - name: Run Fetch Proxies Script
         run: python -u scripts/01_fetch_proxies.py
 
-      - name: Run GitHub Proxy Tester Script
-        run: python -u scripts/02_test_github.py
+      # مرحله 6: اجرای اسکریپت تست پروکسی (با ابزارهای حرفه‌ای)
+      - name: Run Proxy Tester Script
+        run: python -u scripts/02_test_proxies.py
       
+      # مرحله 7: کامیت و پوش کردن نتایج
       - name: Commit and push results
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.name "GitHub Action (Proxy Tester)"
+          # تمام فایل‌های داخل پوشه output را اضافه کن
           git add -f output/
+          
+          # چک می‌کند که آیا تغییری برای کامیت وجود دارد یا نه
           if ! git diff --staged --quiet; then
-            git commit -m "Update proxy lists and logs"
+            git commit -m "feat(proxies): Update active proxy lists" -m "Total active proxies: $(cat output/github_all.txt | wc -l)"
             git push
           else
-            echo "No changes to commit."
+            echo "No changes in proxy lists to commit."
           fi
