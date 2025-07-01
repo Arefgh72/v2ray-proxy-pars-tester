@@ -16,3 +16,7 @@ https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vmess_iran.tx
 https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vless_iran.txt
 https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt
 https://raw.githubusercontent.com/Kwinshadow/TelegramV2rayCollector/main/sublinks/b64vless.txt
+https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria
+https://raw.githubusercontent.com/mshojaei77/v2rayAuto/refs/heads/main/subs/hysteria
+https://raw.githubusercontent.com/mshojaei77/v2rayAuto/refs/heads/main/subs/hy2
+https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/subscribe/protocols/hysteria
