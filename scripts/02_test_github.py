@@ -1,6 +1,5 @@
 import os
-# --- تغییر اینجاست: استفاده از کتابخانه جدید ---
-from curl_cffi import requests
+import requests  # <-- استفاده از کتابخانه استاندارد و صحیح برای این اسکریپت
 import zipfile
 import subprocess
 import json
@@ -11,7 +10,6 @@ import base64
 from urllib.parse import urlparse, parse_qs, unquote
 from utils import log_error
 
-# ... (بقیه کد دقیقاً مثل قبل است و نیازی به تغییر ندارد) ...
 # --- تنظیمات ---
 RAW_PROXIES_FILE = 'output/raw_proxies.txt'
 OUTPUT_ALL_FILE = 'output/github_all.txt'
@@ -20,9 +18,9 @@ OUTPUT_TOP_100_FILE = 'output/github_top_100.txt'
 
 XRAY_EXECUTABLE_PATH = './xray'
 XRAY_LOCAL_PORT = 10808
-TEST_URL = 'https://www.youtube.com/' # استفاده از یوتیوب طبق خواسته شما
+TEST_URL = 'https://www.youtube.com/'  # استفاده از URL تست واقعی‌تر
 TIMEOUT_SECONDS = 25
-MAX_LATENCY_MS = 4000 # افزایش آستانه به خاطر سنگین‌تر بودن تست یوتیوب
+MAX_LATENCY_MS = 4000  # آستانه بالاتر به دلیل سنگین بودن تست یوتیوب
 
 total_proxies_to_test = 0
 tested_proxies_count = 0
@@ -37,9 +35,8 @@ def download_and_extract_xray():
     
     print("Downloading Xray-core...")
     try:
-        # --- تغییر اینجاست: استفاده از کتابخانه جدید برای دانلود ---
         api_url = "https://api.github.com/repos/XTLS/Xray-core/releases/latest"
-        response = requests.get(api_url, impersonate="chrome110", timeout=20)
+        response = requests.get(api_url, timeout=20)
         response.raise_for_status()
         assets = response.json()['assets']
         
@@ -50,11 +47,11 @@ def download_and_extract_xray():
             return False
             
         print(f"Downloading from: {download_url}")
-        # برای دانلود فایل با این کتابخانه، stream=True پشتیبانی نمی‌شود، پس مستقیم دانلود می‌کنیم
-        response = requests.get(download_url, impersonate="chrome110", timeout=90)
-        response.raise_for_status()
-        with open("xray.zip", "wb") as f:
-            f.write(response.content)
+        with requests.get(download_url, stream=True, timeout=60) as r:
+            r.raise_for_status()
+            with open("xray.zip", "wb") as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
                     
         print("Extracting Xray...")
         with zipfile.ZipFile("xray.zip", 'r') as zip_ref:
@@ -66,27 +63,34 @@ def download_and_extract_xray():
         return True
 
     except Exception as e:
-        log_error("Xray Download", "An error occurred during download or extraction.", f"{type(e).__name__}: {e}")
+        log_error("Xray Download", "An error occurred during download or extraction.", str(e))
         return False
 
 def parse_proxy_link_to_xray_outbound(proxy_url: str):
-    # ... (این تابع بدون تغییر باقی می‌ماند) ...
+    """
+    یک پارسر جامع که لینک‌های مختلف را به یک کانفیگ outbound استاندارد Xray تبدیل می‌کند.
+    """
     try:
         parsed_url = urlparse(proxy_url)
         protocol = parsed_url.scheme
         params = parse_qs(parsed_url.query)
+
         network = params.get("type", [None])[0] or params.get("net", ["tcp"])[0]
         security = params.get("security", ["none"])[0]
+        
         address = parsed_url.hostname
         port = parsed_url.port
         uuid_or_pass = unquote(parsed_url.username or "")
+        
         stream_settings = {"network": network, "security": security}
+        
         if security == 'tls':
             sni = params.get('sni', [None])[0] or params.get('host', [address])[0]
             alpn = params.get('alpn', [None])[0]
             tls_settings = {"serverName": sni}
             if alpn: tls_settings["alpn"] = alpn.split(',')
             stream_settings['tlsSettings'] = tls_settings
+
         if network == 'ws':
             host = params.get('host', [sni if security == 'tls' else address])[0]
             path = params.get('path', ['/'])[0]
@@ -94,6 +98,7 @@ def parse_proxy_link_to_xray_outbound(proxy_url: str):
         elif network == 'grpc':
             service_name = params.get('serviceName', [''])[0]
             stream_settings['grpcSettings'] = {"serviceName": service_name, "multiMode": (params.get("mode", ["gun"])[0] == "multi")}
+
         outbound_settings = {}
         if protocol == "vless":
             outbound_settings = {"vnext": [{"address": address, "port": port, "users": [{"id": uuid_or_pass, "flow": params.get("flow", [None])[0]}]}]}
@@ -111,9 +116,11 @@ def parse_proxy_link_to_xray_outbound(proxy_url: str):
             outbound_settings = {"servers": [{"method": method, "password": password, "address": address, "port": port}]}
         else:
             return None
+        
         return {"protocol": protocol, "settings": outbound_settings, "streamSettings": stream_settings}
+
     except Exception as e:
-        log_error("Smart Parser", f"Failed for proxy: {proxy_url[:60]}...", f"{type(e).__name__}: {e}")
+        log_error("Smart Parser", f"Failed for proxy: {proxy_url[:60]}...", str(e))
         return None
 
 def test_proxy(proxy_url: str) -> tuple[int, str]:
@@ -132,26 +139,22 @@ def test_proxy(proxy_url: str) -> tuple[int, str]:
         process = subprocess.Popen([XRAY_EXECUTABLE_PATH, "-config", config_filename], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(1.5)
         start_time = time.time()
-        # --- تغییر اینجاست: استفاده از کتابخانه جدید برای تست ---
         proxies = {"http": f"http://127.0.0.1:{XRAY_LOCAL_PORT}", "https": f"http://127.0.0.1:{XRAY_LOCAL_PORT}"}
-        response = requests.get(TEST_URL, proxies=proxies, impersonate="chrome110", timeout=TIMEOUT_SECONDS)
+        response = requests.get(TEST_URL, proxies=proxies, timeout=TIMEOUT_SECONDS)
         end_time = time.time()
-        
         if response.status_code == 200:
             return int((end_time - start_time) * 1000), "SUCCESS"
         else:
             return -1, f"HTTP_{response.status_code}"
-    except Exception as e:
-        # خطای تایم‌اوت در این کتابخانه نوع متفاوتی دارد
-        if "timed out" in str(e).lower():
-            return -1, "TIMEOUT"
+    except requests.exceptions.Timeout:
+        return -1, "TIMEOUT"
+    except requests.exceptions.RequestException:
         return -1, "CONN_ERROR"
     finally:
         if process: process.terminate(); process.wait()
         if os.path.exists(config_filename): os.remove(config_filename)
 
 def worker(proxy_queue, results_list, progress_lock):
-    # ... (این تابع بدون تغییر باقی می‌ماند) ...
     global tested_proxies_count, total_proxies_to_test
     while not proxy_queue.empty():
         try:
@@ -160,6 +163,7 @@ def worker(proxy_queue, results_list, progress_lock):
             if status == "SUCCESS" and latency < MAX_LATENCY_MS:
                 results_list.append({'proxy': proxy, 'latency': latency})
                 print(f"  SUCCESS | {latency:4d}ms | {proxy[:60]}...")
+            
             with progress_lock:
                 tested_proxies_count += 1
                 if tested_proxies_count % 100 == 0:
@@ -171,11 +175,11 @@ def worker(proxy_queue, results_list, progress_lock):
             proxy_queue.task_done()
 
 def main():
-    # ... (این تابع بدون تغییر باقی می‌ماند) ...
     global total_proxies_to_test
     print("\n--- Running 02_test_github.py (Hiddify-style Smart Parser) ---")
     if not download_and_extract_xray():
         sys.exit(1)
+    
     try:
         with open(RAW_PROXIES_FILE, 'r') as f: proxies = [line.strip() for line in f if line.strip()]
         total_proxies_to_test = len(proxies)
@@ -183,39 +187,49 @@ def main():
     except FileNotFoundError:
         log_error("GitHub Test", f"'{RAW_PROXIES_FILE}' not found.")
         return
+        
     if total_proxies_to_test == 0:
         print("No proxies to test.")
         return
+
     from queue import Queue
     proxy_queue = Queue()
     for p in proxies: proxy_queue.put(p)
+    
     results = []
     threads = []
     num_threads = 50
     progress_lock = threading.Lock()
     print(f"Starting test with {num_threads} threads...")
+    
     for _ in range(num_threads):
         t = threading.Thread(target=worker, args=(proxy_queue, results, progress_lock))
         t.daemon = True
         t.start()
         threads.append(t)
+    
     proxy_queue.join()
+    
     if total_proxies_to_test > 0:
         print(f"\nFinal Progress: 100.00% tested.")
+    
     print(f"\nTest finished. Found {len(results)} working proxies.")
-    if not results:
-        print("No working proxies found.")
+    
     sorted_results = sorted(results, key=lambda x: x['latency'])
     sorted_proxies = [item['proxy'] for item in sorted_results]
+    
     print("Saving results...")
     with open(OUTPUT_ALL_FILE, 'w') as f: f.write('\n'.join(sorted_proxies))
     print(f"  -> Saved {len(sorted_proxies)} to '{OUTPUT_ALL_FILE}'")
+    
     top_500 = sorted_proxies[:500]
     with open(OUTPUT_TOP_500_FILE, 'w') as f: f.write('\n'.join(top_500))
     print(f"  -> Saved {len(top_500)} to '{OUTPUT_TOP_500_FILE}'")
+    
     top_100 = sorted_proxies[:100]
     with open(OUTPUT_TOP_100_FILE, 'w') as f: f.write('\n'.join(top_100))
     print(f"  -> Saved {len(top_100)} to '{OUTPUT_TOP_100_FILE}'")
+    
     print("--- Finished 02_test_github.py ---")
 
 if __name__ == "__main__":
