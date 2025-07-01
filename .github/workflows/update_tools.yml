@@ -1,12 +1,8 @@
-# نام ورک‌فلو: آپدیت کننده ابزارهای هسته
 name: Update Core Tools
 
 on:
   schedule:
-    # هر روز در ساعت 01:05 بامداد UTC اجرا شود
     - cron: '5 1 * * *'
-  
-  # اجازه اجرای دستی از طریق تب Actions
   workflow_dispatch:
 
 permissions:
@@ -32,7 +28,8 @@ jobs:
           VERSION_FILE="base/$TOOL_NAME.version"
           
           echo "Checking for $TOOL_NAME updates from $REPO..."
-          LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+          # --- تغییر اصلی: استفاده از jq برای استخراج تگ ---
+          LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | jq -r '.tag_name')
           echo "Latest version on GitHub is: $LATEST_TAG"
 
           CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
@@ -42,7 +39,6 @@ jobs:
             echo "New version found! Downloading $LATEST_TAG..."
             DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/x-ray-ping_linux_amd64.tar.gz"
             
-            # دانلود، از حالت فشرده خارج کردن و تغییر نام
             curl -L -o tool.tar.gz "$DOWNLOAD_URL"
             tar -xzf tool.tar.gz
             mv x-ray-ping "base/$TOOL_NAME"
@@ -66,7 +62,8 @@ jobs:
           VERSION_FILE="base/$TOOL_NAME.version"
           
           echo "Checking for $TOOL_NAME updates from $REPO..."
-          LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+          # --- تغییر اصلی: استفاده از jq برای استخراج تگ ---
+          LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | jq -r '.tag_name')
           echo "Latest version on GitHub is: $LATEST_TAG"
           
           CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
@@ -94,6 +91,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action (Tool Updater)"
           git add base/
-          
           git commit -m "chore(base): Update core tools automatically"
           git push
