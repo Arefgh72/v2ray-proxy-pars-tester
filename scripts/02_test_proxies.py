@@ -34,9 +34,9 @@ def check_singbox_executable() -> bool:
 def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
     """
     لینک پراکسی را به یک دیکشنری معتبر برای کانفیگ sing-box تجزیه می‌کند.
-    این تابع بازنویسی شده تا بر اساس مستندات واقعی کار کند.
     """
     try:
+        # مدیریت لینک‌های VMess که Base64 هستند
         if proxy_link.startswith('vmess://'):
             try:
                 decoded_link = base64.b64decode(proxy_link.replace('vmess://', '')).decode('utf-8')
@@ -50,38 +50,46 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
                     "alter_id": int(vmess_config.get('aid', 0))
                 }
                 if vmess_config.get('net') and vmess_config.get('net') != 'tcp':
-                    config['transport'] = {
-                        "type": vmess_config.get('net'),
-                        "path": vmess_config.get('path'),
-                        "headers": {"Host": vmess_config.get('host')} if vmess_config.get('host') else None
-                    }
+                    transport = {"type": vmess_config.get('net')}
+                    if 'path' in vmess_config: transport['path'] = vmess_config['path']
+                    if 'host' in vmess_config: transport['headers'] = {'Host': vmess_config['host']}
+                    config['transport'] = transport
+
                 if vmess_config.get('tls') == 'tls':
-                    config.setdefault('transport', {})['tls'] = {"enabled": True, "server_name": vmess_config.get('sni', vmess_config.get('host'))}
+                    config.setdefault('transport', {})['tls'] = {
+                        "enabled": True, 
+                        "server_name": vmess_config.get('sni', vmess_config.get('host'))
+                    }
                 return config
-            except: return None # اگر پارس کردن vmess شکست خورد
-        
+            except: return None
+
         parsed = urlparse(proxy_link)
-        protocol = parsed.scheme
-        if protocol not in ['vless', 'trojan', 'ss', 'hysteria', 'hy2', 'hysteria2']: return None
+        # --- اصلاح خطا: نام صحیح پروتکل‌ها ---
+        protocol_map = {
+            'ss': 'shadowsocks', 'hy': 'hysteria', 'hy2': 'hysteria2',
+            'vless': 'vless', 'trojan': 'trojan'
+        }
+        protocol = protocol_map.get(parsed.scheme)
+        if not protocol: return None
         
         params = parse_qs(parsed.query)
         outbound_config = {
-            "type": "hysteria2" if protocol in ['hy2', 'hysteria2'] else ('hysteria' if protocol == 'hy' else protocol),
-            "tag": "proxy-out", "server": parsed.hostname, "server_port": parsed.port
+            "type": protocol, "tag": "proxy-out",
+            "server": parsed.hostname, "server_port": parsed.port
         }
         
-        if protocol in ['vless', 'trojan']:
-            outbound_config['uuid' if protocol == 'vless' else 'password'] = parsed.username
-        elif protocol == 'ss':
-            #
+        if protocol == 'vless': outbound_config['uuid'] = parsed.username
+        elif protocol == 'trojan': outbound_config['password'] = parsed.username
+        elif protocol == 'shadowsocks':
             decoded_user = base64.urlsafe_b64decode(parsed.username + '===').decode('utf-8')
             method, password = decoded_user.split(':', 1)
             outbound_config['method'] = method
             outbound_config['password'] = password
 
         transport_config = {}
-        if 'type' in params and params['type'][0] == 'ws':
-            transport_config['type'] = 'ws'
+        # --- اصلاح خطا: ساخت transport فقط برای انواع غیر TCP ---
+        if 'type' in params and params['type'][0] != 'tcp':
+            transport_config['type'] = params['type'][0]
             if 'path' in params: transport_config['path'] = params['path'][0]
             if 'host' in params: transport_config['headers'] = {'Host': params['host'][0]}
         
@@ -89,8 +97,7 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
             transport_config.setdefault('tls', {})['enabled'] = True
             if 'sni' in params: transport_config.setdefault('tls', {})['server_name'] = params['sni'][0]
             if 'allowInsecure' in params and params['allowInsecure'][0] == '1': transport_config.setdefault('tls', {})['insecure'] = True
-            if 'alpn' in params: transport_config.setdefault('tls', {})['alpn'] = params['alpn'][0].split(',')
-
+        
         if transport_config: outbound_config['transport'] = transport_config
         
         return outbound_config
@@ -101,7 +108,8 @@ def create_singbox_config(outbound_config: Dict) -> None:
     config = {
         "inbounds": [{"type": "socks", "listen": "127.0.0.1", "listen_port": LOCAL_SOCKS_PORT, "tag": "socks-in"}],
         "outbounds": [outbound_config],
-        "routing": {"rules": [{"inbound": ["socks-in"], "outbound": "proxy-out"}]}
+        # --- اصلاح خطا: نام صحیح فیلد 'route' ---
+        "route": {"rules": [{"inbound": ["socks-in"], "outbound": "proxy-out"}]}
     }
     with open(TEMP_CONFIG_FILE, 'w') as f:
         json.dump(config, f)
@@ -143,6 +151,7 @@ def test_single_proxy(proxy_link: str) -> Optional[int]:
             singbox_process.wait()
 
 def save_results_as_base64(sorted_proxies: List[str]) -> None:
+    # ... (کد بدون تغییر)
     print("\n[INFO] Saving results to output files (Base64 encoded)...")
     all_content = "\n".join(sorted_proxies)
     all_base64 = base64.b64encode(all_content.encode('utf-8')).decode('utf-8')
@@ -165,6 +174,7 @@ def save_results_as_base64(sorted_proxies: List[str]) -> None:
         print(f"  -> Saved {len(top_100)} proxies to '{OUTPUT_FILES['top_100']}'.")
 
 def main():
+    # ... (کد بدون تغییر)
     print("\n--- Running 02_test_proxies.py ---")
     if not check_singbox_executable():
         sys.exit(1)
