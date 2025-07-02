@@ -1,0 +1,55 @@
+name: Update Core Tools
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create base directory
+        run: mkdir -p base
+
+      - name: Update Xray-Core
+        run: |
+          TOOL_NAME="xray-core"
+          REPO="XTLS/Xray-core"
+          API_RESPONSE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest")
+          LATEST_TAG=$(echo "$API_RESPONSE" | jq -r '.tag_name')
+          DOWNLOAD_URL=$(echo "$API_RESPONSE" | jq -r '.assets[] | select(.name=="Xray-linux-64.zip") | .browser_download_url')
+          if [ -z "$DOWNLOAD_URL" ]; then echo "Could not find Xray download URL"; exit 1; fi
+          echo "Downloading Xray-Core $LATEST_TAG..."
+          curl -L -o tool.zip "$DOWNLOAD_URL"
+          unzip -o tool.zip xray -d base/
+          mv base/xray "base/$TOOL_NAME"
+          chmod +x "base/$TOOL_NAME"
+          rm tool.zip
+          echo "$LATEST_TAG" > "base/$TOOL_NAME.version"
+
+      - name: Update Hysteria2-Client
+        run: |
+          TOOL_NAME="hysteria-client"
+          REPO="apernet/hysteria"
+          API_RESPONSE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest")
+          LATEST_TAG=$(echo "$API_RESPONSE" | jq -r '.tag_name')
+          DOWNLOAD_URL=$(echo "$API_RESPONSE" | jq -r '.assets[] | select(.name=="hysteria-linux-amd64") | .browser_download_url')
+          if [ -z "$DOWNLOAD_URL" ]; then echo "Could not find Hysteria download URL"; exit 1; fi
+          echo "Downloading Hysteria $LATEST_TAG..."
+          curl -L -f -o "base/$TOOL_NAME" "$DOWNLOAD_URL"
+          chmod +x "base/$TOOL_NAME"
+          echo "$LATEST_TAG" > "base/$TOOL_NAME.version"
+
+      - name: Commit and push updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action (Tool Updater)"
+          git add base/
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(base): Update core tools"
+            git push
+          else
+            echo "Tools are up to date."
+          fi
