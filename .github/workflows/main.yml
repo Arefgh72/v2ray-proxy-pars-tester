@@ -4,7 +4,7 @@ name: V2Ray Proxy Auto Tester
 on:
   # هر 3 ساعت یکبار اجرا شود
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '15 */3 * * *' # در دقیقه 15 هر 3 ساعت برای جلوگیری از ترافیک همزمان با دیگران
   
   # اجازه اجرای دستی
   workflow_dispatch:
@@ -18,8 +18,11 @@ jobs:
     
     steps:
       # مرحله 1: دریافت کد ریپازیتوری (شامل پوشه base با ابزارها)
+      # ما به `fetch-depth: 0` نیاز داریم تا git بتواند تفاوت‌ها را برای کامیت تشخیص دهد
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # مرحله 2: نصب پایتون
       - name: Set up Python
@@ -31,7 +34,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests curl_cffi # نصب هر دو برای اطمینان
+          pip install requests curl_cffi
 
       # مرحله 4: دادن مجوز اجرایی به ابزارهای تست
       - name: Make tools executable
@@ -50,12 +53,17 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action (Proxy Tester)"
-          # تمام فایل‌های داخل پوشه output را اضافه کن
+          
+          # فقط فایل‌های داخل پوشه output را اضافه کن
           git add -f output/
           
           # چک می‌کند که آیا تغییری برای کامیت وجود دارد یا نه
           if ! git diff --staged --quiet; then
-            git commit -m "feat(proxies): Update active proxy lists" -m "Total active proxies: $(cat output/github_all.txt | wc -l)"
+            # یک پیام کامیت معنادار می‌سازیم
+            COMMIT_MESSAGE="feat(proxies): Update active proxy lists on $(date -u)"
+            PROXY_COUNT=$(cat output/github_all.txt | wc -l)
+            COMMIT_DETAILS="Total active proxies found: $PROXY_COUNT"
+            git commit -m "$COMMIT_MESSAGE" -m "$COMMIT_DETAILS"
             git push
           else
             echo "No changes in proxy lists to commit."
