@@ -13,7 +13,7 @@ jobs:
           python-version: '3.10'
       # --- تغییر اصلی: نصب کتابخانه‌های صحیح ---
       - name: Install dependencies
-        run: pip install curl_cffi
+        run: pip install curl_cffi requests PySocks
       - name: Make tools executable
         run: chmod +x ./base/*
       - name: Run Proxy Tester Script
