@@ -21,11 +21,8 @@ LOCAL_SOCKS_PORT = 2080
 TEST_URL = 'https://www.youtube.com/'
 PROGRESS_UPDATE_INTERVAL = 100
 
-# --- <<< سیستم دیباگ دائمی و قابل کنترل >>> ---
-# برای فعال کردن لاگ‌های دقیق، این متغیر را به True تغییر دهید.
-# یا می‌توانید آن را از طریق متغیرهای محیطی گیت‌هاب اکشن کنترل کنید:
-# DEBUG_MODE = os.getenv('DEBUG_MODE', 'false').lower() == 'true'
-DEBUG_MODE = True # فعلا به صورت پیش‌فرض فعال می‌گذاریم
+# --- سیستم دیباگ دائمی و قابل کنترل ---
+DEBUG_MODE = True
 
 def check_singbox_executable() -> bool:
     if not os.path.exists(SING_BOX_EXECUTABLE) or not os.access(SING_BOX_EXECUTABLE, os.X_OK):
@@ -35,17 +32,46 @@ def check_singbox_executable() -> bool:
         return False
     return True
 
-def create_singbox_config(proxy_link: str) -> None:
+def create_singbox_config(proxy_link: str) -> bool:
+    """
+    کانفیگ sing-box را به صورت پویا بر اساس نوع پروتکل پراکسی ایجاد می‌کند.
+    در صورت موفقیت True و در غیر این صورت False برمی‌گرداند.
+    """
+    protocol_type = None
+    if proxy_link.startswith('vless://'):
+        protocol_type = 'vless'
+    elif proxy_link.startswith('vmess://'):
+        protocol_type = 'vmess'
+    elif proxy_link.startswith('trojan://'):
+        protocol_type = 'trojan'
+    elif proxy_link.startswith('ss://'):
+        protocol_type = 'shadowsocks'
+    elif proxy_link.startswith('hy2://') or proxy_link.startswith('hysteria2://'):
+        protocol_type = 'hysteria2'
+    elif proxy_link.startswith('hy://') or proxy_link.startswith('hysteria://'):
+        protocol_type = 'hysteria'
+    
+    if not protocol_type:
+        return False # پروتکل ناشناخته، نمی‌توان تست کرد
+
     config = {
         "inbounds": [{"type": "socks", "listen": "127.0.0.1", "listen_port": LOCAL_SOCKS_PORT, "tag": "socks-in"}],
-        "outbounds": [{"type": "url", "url": proxy_link, "tag": "proxy-out"}],
+        "outbounds": [{
+            "type": protocol_type, # <<< این بخش کلیدی و صحیح است >>>
+            "tag": "proxy-out",
+            "url": proxy_link
+        }],
         "routing": {"rules": [{"inbound": ["socks-in"], "outbound": "proxy-out"}]}
     }
     with open(TEMP_CONFIG_FILE, 'w') as f:
         json.dump(config, f)
+    return True
 
 def test_single_proxy(proxy_link: str) -> Optional[int]:
-    create_singbox_config(proxy_link)
+    # اگر نتوان برای پراکسی کانفیگ ساخت، آن را رد کن
+    if not create_singbox_config(proxy_link):
+        return None
+
     singbox_process = None
     try:
         cmd_run = [SING_BOX_EXECUTABLE, 'run', '-c', TEMP_CONFIG_FILE]
@@ -61,30 +87,30 @@ def test_single_proxy(proxy_link: str) -> Optional[int]:
         
         curl_result = subprocess.run(cmd_curl, capture_output=True, text=True, check=False)
 
+        # اولین کاری که می‌کنیم، بستن پردازش sing-box است
+        singbox_process.kill()
+
         if curl_result.returncode == 0 and curl_result.stdout:
-            singbox_process.kill()
             try:
                 total_time_sec = float(curl_result.stdout.replace(',', '.'))
                 return int(total_time_sec * 1000)
             except (ValueError, IndexError):
                 return None
         
-        # --- سیستم دیباگ که دیگر حذف نخواهد شد ---
+        # اگر تست شکست خورد، لاگ دیباگ را نشان بده
         if DEBUG_MODE:
-            singbox_process.kill()
             singbox_stdout, singbox_stderr = singbox_process.communicate(timeout=2)
             sys.stdout.write('\n')
-            print("="*20 + " DEBUG START " + "="*20)
+            print("="*20 + " DEBUG INFO " + "="*20)
             print(f"Proxy: {proxy_link[:80]}...")
             print(f"CURL Exit Code: {curl_result.returncode} | CURL Stderr: {curl_result.stderr.strip()}")
-            print(f"Sing-box Stderr: {singbox_stderr.strip()}")
-            print("="*21 + " DEBUG END " + "="*21 + "\n")
+            # فقط در صورتی لاگ sing-box را نشان بده که چیزی برای گفتن داشته باشد
+            if singbox_stderr:
+                print(f"Sing-box Stderr: {singbox_stderr.strip()}")
+            print("="*21 + " DEBUG END " + "="*22 + "\n")
         
         return None
-    except Exception as e:
-        if DEBUG_MODE:
-            sys.stdout.write('\n')
-            print(f"DEBUG: A Python exception occurred: {e}")
+    except Exception:
         return None
     finally:
         if singbox_process and singbox_process.poll() is None:
