@@ -1,36 +1,23 @@
-# نام ورک‌فلو برای حالت دیباگ
-name: V2Ray Proxy Debugger
-
+name: V2Ray Proxy Auto Tester
 on:
-  # فقط به صورت دستی از طریق تب Actions اجرا شود
-  workflow_dispatch:
-
+  workflow_dispatch: # فعلا فقط دستی برای تست
+permissions:
+  contents: write
 jobs:
-  debug-single-proxy:
+  test-and-commit:
     runs-on: ubuntu-latest
-    
     steps:
-      # مرحله 1: دریافت کد ریپازیتوری
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # مرحله 2: نصب پایتون
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      
-      # مرحله 3: نصب وابستگی‌های پایتون (شامل PySocks)
+      # --- تغییر اصلی: نصب کتابخانه‌های صحیح ---
       - name: Install dependencies
-        run: pip install requests PySocks
-
-      # مرحله 4: دادن مجوز اجرایی به ابزارهای در پوشه base
+        run: pip install curl_cffi
       - name: Make tools executable
         run: chmod +x ./base/*
-      
-      # مرحله 5: اجرای اسکریپت دیباگ برای یک پروکسی تکی
-      - name: Run Single Proxy Debug Script
+      - name: Run Proxy Tester Script
         env:
-          # پروکسی سالم شما مستقیماً در اینجا به عنوان متغیر محیطی تعریف شده
+          # پروکسی سالم شما برای دیباگ
           PROXY_TO_TEST: 'vless://7c9e3c1d-a360-4429-9189-e45a98de7fde@[::ffff:45.142.120.8]:443?encryption=none&security=tls&sni=mail.ski1plag.ir&alpn=h2%2Chttp%2F1.1&fp=random&type=ws&host=mail.ski1plag.ir&path=%2Fupload'
         run: python -u scripts/02_test_proxies.py
