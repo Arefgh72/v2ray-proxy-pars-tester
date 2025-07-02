@@ -19,6 +19,7 @@ jobs:
       - name: Create base directory if not exists
         run: mkdir -p base
 
+      # --- مرحله ۱: آپدیت Xray-Core ---
       - name: Update Xray-Core
         id: update_xray
         run: |
@@ -27,59 +28,73 @@ jobs:
           VERSION_FILE="base/$TOOL_NAME.version"
           
           echo "Checking for $TOOL_NAME updates..."
-          LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | jq -r '.tag_name')
-          echo "Latest version is: $LATEST_TAG"
+          API_RESPONSE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest")
+          LATEST_TAG=$(echo "$API_RESPONSE" | jq -r '.tag_name')
+          
+          if [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" == "null" ]; then
+            echo "Error: Could not find latest version for $TOOL_NAME."
+            exit 1
+          fi
 
+          echo "Latest version is: $LATEST_TAG"
           CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
           echo "Current version is: $CURRENT_VERSION"
           
           if [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
             echo "New version found! Downloading..."
-            DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/Xray-linux-64.zip"
+            DOWNLOAD_URL=$(echo "$API_RESPONSE" | jq -r '.assets[] | select(.name=="Xray-linux-64.zip") | .browser_download_url')
             
-            curl -L -o xray.zip "$DOWNLOAD_URL"
-            unzip -o xray.zip xray -d .
+            curl -L -o tool.zip "$DOWNLOAD_URL"
+            unzip -o tool.zip xray -d .
             mv xray "base/$TOOL_NAME"
             chmod +x "base/$TOOL_NAME"
-            rm xray.zip
+            rm tool.zip
             
             echo "$LATEST_TAG" > "$VERSION_FILE"
-            echo "$TOOL_NAME updated."
+            echo "$TOOL_NAME updated to $LATEST_TAG."
             echo "updated=true" >> $GITHUB_OUTPUT
           else
             echo "$TOOL_NAME is up to date."
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
 
+      # --- مرحله ۲: آپدیت Hysteria 2 Client ---
       - name: Update Hysteria-Client
         id: update_hysteria
         run: |
-          # (کد این بخش که برای Hysteria به درستی کار می‌کرد، بدون تغییر باقی می‌ماند)
           TOOL_NAME="hysteria-client"
           REPO="apernet/hysteria"
           VERSION_FILE="base/$TOOL_NAME.version"
           
           echo "Checking for $TOOL_NAME updates..."
-          LATEST_TAG=$(curl -sI "https://github.com/$REPO/releases/latest" | grep -i "location:" | awk -F'/' '{print $NF}' | tr -d '\r')
-          echo "Latest version is: $LATEST_TAG"
+          API_RESPONSE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest")
+          LATEST_TAG=$(echo "$API_RESPONSE" | jq -r '.tag_name')
+          
+          if [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" == "null" ]; then
+            echo "Error: Could not find latest version for $TOOL_NAME."
+            exit 1
+          fi
 
+          echo "Latest version is: $LATEST_TAG"
           CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
           echo "Current version is: $CURRENT_VERSION"
-
+          
           if [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
             echo "New version found! Downloading..."
-            DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/hysteria-linux-amd64"
+            DOWNLOAD_URL=$(echo "$API_RESPONSE" | jq -r '.assets[] | select(.name=="hysteria-linux-amd64") | .browser_download_url')
+
             curl -L -f -o "base/$TOOL_NAME" "$DOWNLOAD_URL"
             chmod +x "base/$TOOL_NAME"
             
             echo "$LATEST_TAG" > "$VERSION_FILE"
-            echo "$TOOL_NAME updated."
+            echo "$TOOL_NAME updated to $LATEST_TAG."
             echo "updated=true" >> $GITHUB_OUTPUT
           else
             echo "$TOOL_NAME is up to date."
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
 
+      # --- مرحله ۳: کامیت کردن تغییرات ---
       - name: Commit and push updates
         if: steps.update_xray.outputs.updated == 'true' || steps.update_hysteria.outputs.updated == 'true'
         run: |
