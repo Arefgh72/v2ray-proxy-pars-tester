@@ -1,31 +1,27 @@
-# نام ورک‌فلو که در بخش Actions گیت‌هاب نمایش داده می‌شود
+# نام ورک‌فلو
 name: Fetch and Test Proxies CI
 
-# --- تریگرها: چه زمانی این ورک‌فلو اجرا شود ---
+# --- تریگرها ---
 on:
-  # قابلیت اجرای دستی از طریق صفحه Actions گیت‌هاب
   workflow_dispatch:
-
-  # اجرای زمان‌بندی شده
   schedule:
-    # این کد هر 3 ساعت یک‌بار اجرا می‌شود (در ساعت 0, 3, 6, 9, ...)
     - cron: '0 */3 * * *'
 
-# --- تعریف کارها (Jobs) ---
-jobs:
-  # ما فقط یک کار اصلی به نام update-proxies داریم
-  update-proxies:
-    # این کار روی یک ماشین مجازی اوبونتو آخرین نسخه اجرا می‌شود
-    runs-on: ubuntu-latest
+# --- <<< تغییر اصلی و نهایی: اضافه کردن مجوزها >>> ---
+# این بخش به ورک‌فلو اجازه می‌دهد تا در مخزن شما کد پوش کند.
+permissions:
+  contents: write
 
-    # --- مراحل اجرای کار ---
+# --- تعریف کارها ---
+jobs:
+  update-proxies:
+    runs-on: ubuntu-latest
     steps:
-      # مرحله 1: دریافت کد از مخزن گیت‌هاب شما
+      # مرحله ۱: دریافت کد
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # مرحله 2: نصب ابزار کلیدی تست (Sing-box)
-      # این بخش به صورت داینامیک آخرین نسخه را پیدا، دانلود و نصب می‌کند
+      # مرحله ۲: نصب Sing-box
       - name: Install and Setup Sing-box
         run: |
           echo "Fetching latest Sing-box version..."
@@ -34,50 +30,44 @@ jobs:
               echo "Failed to fetch latest tag. Exiting."
               exit 1
           fi
-          echo "Latest version tag is: $LATEST_TAG"
-
           DOWNLOAD_URL="https://github.com/SagerNet/sing-box/releases/download/${LATEST_TAG}/sing-box-${LATEST_TAG#v}-linux-amd64.tar.gz"
           echo "Downloading from: $DOWNLOAD_URL"
-          
           curl -L -o sing-box.tar.gz "$DOWNLOAD_URL"
           tar -xzf sing-box.tar.gz
           mv sing-box-*/sing-box .
           chmod +x ./sing-box
-          
-          echo "Sing-box setup complete. Version info:"
-          ./sing-box version
+          echo "Sing-box setup complete."
 
-      # مرحله 3: راه‌اندازی محیط پایتون
+      # مرحله ۳: راه‌اندازی پایتون
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # مرحله 4: نصب کتابخانه‌های پایتون
+      # مرحله ۴: نصب وابستگی‌ها
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # مرحله 5: اجرای اسکریپت‌ها به ترتیب (با استفاده از فرمت ماژول)
-      # این تغییر اصلی برای حل مشکل ImportError است.
-      - name: Run 01_fetch_proxies.py as a module
+      # مرحله ۵: اجرای اسکریپت‌ها
+      - name: Run Fetch Proxies
         run: python -m scripts.01_fetch_proxies
 
-      - name: Run 02_test_proxies.py as a module
+      - name: Run Test Proxies
         run: python -m scripts.02_test_proxies
 
-      # مرحله 6: کامیت و پوش کردن فایل‌های خروجی به مخزن
+      # مرحله ۶: کامیت و پوش کردن نتایج
       - name: Commit and Push Results
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          
           git add output/
-          
           COMMIT_MESSAGE="✅ Auto-Update: Proxy lists refreshed at $(date -u)"
-          
-          # کامیت زدن تغییرات. || echo ... از بروز خطا در صورت نبود تغییرات جلوگیری می‌کند.
-          git commit -m "$COMMIT_MESSAGE" || echo "No changes to commit."
-          
-          git push
+          # اگر تغییری وجود داشته باشد، کامیت کن
+          if ! git diff --staged --quiet; then
+            git commit -m "$COMMIT_MESSAGE"
+            git push
+          else
+            echo "No changes to commit."
+          fi
