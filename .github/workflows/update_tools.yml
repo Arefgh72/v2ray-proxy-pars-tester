@@ -2,14 +2,17 @@ name: Update Core Tools
 
 on:
   schedule:
+    # هر روز در ساعت 01:05 بامداد UTC اجرا شود
     - cron: '5 1 * * *'
+  
+  # اجازه اجرای دستی از طریق تب Actions
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write # برای کامیت کردن تغییرات در ریپازیتوری
 
 jobs:
-  update:
+  update-clash-meta:
     runs-on: ubuntu-latest
     
     steps:
@@ -19,87 +22,58 @@ jobs:
       - name: Create base directory if not exists
         run: mkdir -p base
 
-      # --- مرحله ۱: آپدیت Xray-Core ---
-      - name: Update Xray-Core
-        id: update_xray
+      # --- مرحله اصلی: آپدیت تستر (Clash.Meta) ---
+      - name: Update Clash.Meta Tester
+        id: update_tester
         run: |
-          TOOL_NAME="xray-core"
-          REPO="XTLS/Xray-core"
+          TOOL_NAME="clash-tester"
+          REPO="MetaCubeX/Clash.Meta"
           VERSION_FILE="base/$TOOL_NAME.version"
           
-          echo "Checking for $TOOL_NAME updates..."
-          API_RESPONSE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest")
+          echo "Checking for $TOOL_NAME updates from $REPO..."
+          
+          # دریافت اطلاعات آخرین ریلیز با یک روش پایدار
+          API_RESPONSE=$(curl -s --retry 5 --retry-delay 2 "https://api.github.com/repos/$REPO/releases/latest")
           LATEST_TAG=$(echo "$API_RESPONSE" | jq -r '.tag_name')
           
-          if [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" == "null" ]; then
-            echo "Error: Could not find latest version for $TOOL_NAME."
+          # پیدا کردن URL دانلود برای معماری amd64
+          DOWNLOAD_URL=$(echo "$API_RESPONSE" | jq -r '.assets[] | select(.name | contains("linux-amd64")) | .browser_download_url')
+          
+          if [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" == "null" ] || [ -z "$DOWNLOAD_URL" ]; then
+            echo "Error: Could not find latest version or download URL from GitHub API."
             exit 1
           fi
 
-          echo "Latest version is: $LATEST_TAG"
+          echo "Latest version on GitHub is: $LATEST_TAG"
           CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
-          echo "Current version is: $CURRENT_VERSION"
+          echo "Current local version is: $CURRENT_VERSION"
           
           if [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
-            echo "New version found! Downloading..."
-            DOWNLOAD_URL=$(echo "$API_RESPONSE" | jq -r '.assets[] | select(.name=="Xray-linux-64.zip") | .browser_download_url')
+            echo "New version found! Downloading from $DOWNLOAD_URL..."
             
-            curl -L -o tool.zip "$DOWNLOAD_URL"
-            unzip -o tool.zip xray -d .
-            mv xray "base/$TOOL_NAME"
+            # دانلود و از حالت فشرده خارج کردن
+            curl -L -o tool.gz "$DOWNLOAD_URL"
+            gunzip tool.gz
+            
+            # فایل استخراج شده که نامش clash.meta است را جابجا و تغییر نام می‌دهیم
+            mv clash.meta "base/$TOOL_NAME"
             chmod +x "base/$TOOL_NAME"
-            rm tool.zip
             
+            # ذخیره شماره نسخه جدید
             echo "$LATEST_TAG" > "$VERSION_FILE"
-            echo "$TOOL_NAME updated to $LATEST_TAG."
+            echo "$TOOL_NAME has been updated to $LATEST_TAG"
             echo "updated=true" >> $GITHUB_OUTPUT
           else
             echo "$TOOL_NAME is up to date."
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
 
-      # --- مرحله ۲: آپدیت Hysteria 2 Client ---
-      - name: Update Hysteria-Client
-        id: update_hysteria
-        run: |
-          TOOL_NAME="hysteria-client"
-          REPO="apernet/hysteria"
-          VERSION_FILE="base/$TOOL_NAME.version"
-          
-          echo "Checking for $TOOL_NAME updates..."
-          API_RESPONSE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest")
-          LATEST_TAG=$(echo "$API_RESPONSE" | jq -r '.tag_name')
-          
-          if [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" == "null" ]; then
-            echo "Error: Could not find latest version for $TOOL_NAME."
-            exit 1
-          fi
-
-          echo "Latest version is: $LATEST_TAG"
-          CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
-          echo "Current version is: $CURRENT_VERSION"
-          
-          if [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
-            echo "New version found! Downloading..."
-            DOWNLOAD_URL=$(echo "$API_RESPONSE" | jq -r '.assets[] | select(.name=="hysteria-linux-amd64") | .browser_download_url')
-
-            curl -L -f -o "base/$TOOL_NAME" "$DOWNLOAD_URL"
-            chmod +x "base/$TOOL_NAME"
-            
-            echo "$LATEST_TAG" > "$VERSION_FILE"
-            echo "$TOOL_NAME updated to $LATEST_TAG."
-            echo "updated=true" >> $GITHUB_OUTPUT
-          else
-            echo "$TOOL_NAME is up to date."
-            echo "updated=false" >> $GITHUB_OUTPUT
-          fi
-
-      # --- مرحله ۳: کامیت کردن تغییرات ---
+      # --- مرحله کامیت کردن تغییرات ---
       - name: Commit and push updates
-        if: steps.update_xray.outputs.updated == 'true' || steps.update_hysteria.outputs.updated == 'true'
+        if: steps.update_tester.outputs.updated == 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action (Tool Updater)"
           git add base/
-          git commit -m "chore(base): Update core tools"
+          git commit -m "chore(base): Update Clash.Meta test tool to latest"
           git push
