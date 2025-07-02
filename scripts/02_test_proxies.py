@@ -22,7 +22,11 @@ LOCAL_SOCKS_PORT_START = 2080
 TEST_URL = 'https://www.youtube.com/'
 PROGRESS_UPDATE_INTERVAL = 100
 DEBUG_MODE = False
+
+# --- تنظیمات کلیدی ---
 CONCURRENT_TESTS = 250
+# --- <<< شرط جدید: حداکثر پینگ مجاز >>> ---
+MAX_LATENCY_MS = 2000
 
 def check_singbox_executable() -> bool:
     if not os.path.exists(SING_BOX_EXECUTABLE) or not os.access(SING_BOX_EXECUTABLE, os.X_OK):
@@ -33,7 +37,7 @@ def check_singbox_executable() -> bool:
     return True
 
 def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
-    # ... (این تابع صحیح است و بدون تغییر باقی می‌ماند) ...
+    # این تابع کامل و صحیح است و بدون تغییر باقی می‌ماند
     try:
         if proxy_link.startswith('vmess://'): return None
         parsed = urlparse(proxy_link)
@@ -68,7 +72,7 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
     except Exception: return None
 
 def create_singbox_config(outbound_config: Dict, port: int, temp_file_path: str) -> None:
-    # ... (این تابع صحیح است و بدون تغییر باقی می‌ماند) ...
+    # این تابع صحیح است و بدون تغییر باقی می‌ماند
     config = {
         "inbounds": [{"type": "socks", "listen": "127.0.0.1", "listen_port": port, "tag": "socks-in"}],
         "outbounds": [outbound_config],
@@ -78,45 +82,36 @@ def create_singbox_config(outbound_config: Dict, port: int, temp_file_path: str)
         json.dump(config, f)
 
 async def test_single_proxy_async(proxy_index: int, proxy_link: str) -> Optional[Tuple[str, int]]:
+    # این تابع صحیح است و بدون تغییر باقی می‌ماند
     outbound_config = parse_proxy_link(proxy_link)
     if not outbound_config: return None
-    
     port = LOCAL_SOCKS_PORT_START + proxy_index
     temp_file_path = os.path.join(TEMP_DIR, f'config_{proxy_index}.json')
     create_singbox_config(outbound_config, port, temp_file_path)
-    
     singbox_process = None
     try:
         cmd_run = [SING_BOX_EXECUTABLE, 'run', '-c', temp_file_path]
         singbox_process = await asyncio.create_subprocess_exec(*cmd_run, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
         await asyncio.sleep(0.5)
-
         proxy_address = f"socks5h://127.0.0.1:{port}"
         cmd_curl = ['curl', '--proxy', proxy_address, '--connect-timeout', '5', '-m', '8', '--head', '--silent', '--output', '/dev/null', '--write-out', '%{time_total}', TEST_URL]
-        
         proc_curl = await asyncio.create_subprocess_exec(*cmd_curl, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
         stdout, _ = await proc_curl.communicate()
-
         if proc_curl.returncode == 0 and stdout:
             try:
                 latency = int(float(stdout.decode().replace(',', '.')) * 1000)
                 return proxy_link, latency
-            except (ValueError, IndexError):
-                return None
+            except (ValueError, IndexError): return None
         return None
-    except asyncio.CancelledError:
-        return None
-    except Exception:
-        return None
+    except asyncio.CancelledError: return None
+    except Exception: return None
     finally:
-        # --- <<< اصلاح اصلی: چک کردن وضعیت پردازش قبل از بستن آن >>> ---
-        # این شرط از خطای ProcessLookupError جلوگیری می‌کند
         if singbox_process and singbox_process.returncode is None:
             singbox_process.kill()
             await singbox_process.wait()
 
 def save_results_as_base64(sorted_proxies: List[str]) -> None:
-    # ... (کد بدون تغییر)
+    # این تابع صحیح است و بدون تغییر باقی می‌ماند
     print("\n[INFO] Saving results to output files (Base64 encoded)...")
     all_content = "\n".join(sorted_proxies)
     all_base64 = base64.b64encode(all_content.encode('utf-8')).decode('utf-8')
@@ -139,12 +134,9 @@ def save_results_as_base64(sorted_proxies: List[str]) -> None:
         print(f"  -> Saved {len(top_100)} proxies to '{OUTPUT_FILES['top_100']}'.")
 
 async def main_async():
-    # ... (کد بدون تغییر)
-    print("\n--- Running 02_test_proxies.py (Parallel Mode) ---")
+    print("\n--- Running 02_test_proxies.py (Parallel & Filtered) ---")
     if not check_singbox_executable(): sys.exit(1)
-    
     os.makedirs(TEMP_DIR, exist_ok=True)
-
     try:
         with open(RAW_PROXIES_FILE, 'r') as f:
             proxies_to_test = [line.strip() for line in f if line.strip()]
@@ -161,17 +153,24 @@ async def main_async():
     
     semaphore = asyncio.Semaphore(CONCURRENT_TESTS)
     tested_count = 0
+    # --- <<< تغییر ۱: اضافه کردن شمارنده پراکسی‌های با کیفیت >>> ---
+    qualified_count = 0
     
     async def worker(proxy_index, proxy_link):
-        nonlocal tested_count
+        nonlocal tested_count, qualified_count
         async with semaphore:
             result = await test_single_proxy_async(proxy_index, proxy_link)
             if result:
                 healthy_proxies.append(result)
+                # اگر پینگ زیر حد مجاز بود، شمارنده کیفیت را اضافه کن
+                if result[1] < MAX_LATENCY_MS:
+                    qualified_count += 1
+
             tested_count += 1
             if tested_count % PROGRESS_UPDATE_INTERVAL == 0 or tested_count == total_proxies:
                 percentage = (tested_count / total_proxies) * 100
-                progress_line = f"🔄 [PROGRESS] Tested: {tested_count}/{total_proxies} ({percentage:.2f}%) | Healthy: {len(healthy_proxies)}"
+                # --- <<< تغییر ۲: نمایش شمارنده جدید در پروگرس بار >>> ---
+                progress_line = f"🔄 [PROGRESS] Tested: {tested_count}/{total_proxies} ({percentage:.2f}%) | Healthy: {len(healthy_proxies)} | Qualified (<{MAX_LATENCY_MS}ms): {qualified_count}"
                 sys.stdout.write('\r' + progress_line)
                 sys.stdout.flush()
 
@@ -189,20 +188,28 @@ async def main_async():
     print("-" * 35)
     print(f"  Total Proxies Scanned: {total_proxies}")
     print(f"  Total Healthy Proxies: {len(healthy_proxies)}")
+
+    # --- <<< تغییر ۳: فیلتر کردن پراکسی‌ها قبل از ذخیره‌سازی >>> ---
+    print(f"\n[INFO] Filtering healthy proxies with latency < {MAX_LATENCY_MS}ms...")
+    qualified_proxies = [p for p in healthy_proxies if p[1] < MAX_LATENCY_MS]
+    print(f"  -> Found {len(qualified_proxies)} qualified proxies.")
+
     if total_proxies > 0:
-        success_rate = (len(healthy_proxies) / total_proxies) * 100
-        print(f"  Success Rate: {success_rate:.2f}%")
+        success_rate = (len(qualified_proxies) / total_proxies) * 100
+        print(f"  Overall Success Rate (Qualified): {success_rate:.2f}%")
     print("-" * 35)
+
     stats = {'passed_count': 0}
-    if healthy_proxies:
-        healthy_proxies.sort(key=lambda item: item[1])
-        latencies = [item[1] for item in healthy_proxies]
-        stats = {'passed_count': len(healthy_proxies), 'avg_latency': sum(latencies) / len(healthy_proxies), 'min_latency': min(latencies), 'max_latency': max(latencies)}
-        sorted_proxy_links = [item[0] for item in healthy_proxies]
+    if qualified_proxies:
+        qualified_proxies.sort(key=lambda item: item[1])
+        latencies = [item[1] for item in qualified_proxies]
+        stats = {'passed_count': len(qualified_proxies), 'avg_latency': sum(latencies) / len(qualified_proxies), 'min_latency': min(latencies), 'max_latency': max(latencies)}
+        sorted_proxy_links = [item[0] for item in qualified_proxies]
         save_results_as_base64(sorted_proxy_links)
     else:
-        print("\n[INFO] No healthy proxies found. Output files will be empty.")
+        print("\n[INFO] No qualified proxies found. Output files will be empty.")
         save_results_as_base64([])
+        
     log_test_summary(cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0), raw_count=total_proxies, github_stats=stats, iran_stats={})
     print("\n--- Finished 02_test_proxies.py ---")
 
