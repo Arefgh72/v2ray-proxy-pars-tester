@@ -18,7 +18,6 @@ OUTPUT_FILES = {
 TEMP_CONFIG_FILE = 'temp_singbox_config.json'
 error_log_count = 0
 MAX_ERROR_LOGS = 20
-# --- <<< تغییر جدید: فرکانس آپدیت پروگرس بار >>> ---
 PROGRESS_UPDATE_INTERVAL = 100
 
 def check_singbox_executable() -> bool:
@@ -33,8 +32,8 @@ def check_singbox_executable() -> bool:
     return True
 
 def create_singbox_config(proxy_link: str) -> None:
+    # این کانفیگ درست است. ما یک outbound برای تست داریم با تگ speed-test
     config = {
-        "log": {"level": "warn"},
         "outbounds": [
             {
                 "tag": "proxy-to-test",
@@ -55,17 +54,30 @@ def create_singbox_config(proxy_link: str) -> None:
 def test_single_proxy(proxy_link: str) -> Optional[int]:
     global error_log_count
     create_singbox_config(proxy_link)
-    command = [SING_BOX_EXECUTABLE, 'url-test', '-config', TEMP_CONFIG_FILE]
+
+    # --- <<< تغییر اصلی و نهایی: استفاده از دستور صحیح sing-box >>> ---
+    # دستور صحیح 'measure' است، نه 'url-test'.
+    # ما باید outbound ای که می‌خواهیم تست شود را هم مشخص کنیم (-outbound speed-test).
+    command = [
+        SING_BOX_EXECUTABLE,
+        'measure',
+        '-config', TEMP_CONFIG_FILE,
+        '-outbound', 'speed-test' # این خط به sing-box می‌گوید کدام outbound را تست کند
+    ]
+
     try:
         result = subprocess.run(command, capture_output=True, text=True, timeout=15, check=False)
+        
+        # خروجی موفق دستور measure معمولا یک خط حاوی پینگ است
         if result.returncode == 0 and 'ms' in result.stdout:
-            for line in result.stdout.strip().split('\n'):
-                if 'ms' in line:
-                    try:
-                        latency = int(line.split('ms')[0].strip().split()[-1])
-                        return latency
-                    except (ValueError, IndexError):
-                        continue
+            try:
+                # خروجی چیزی شبیه "delay: 123ms" است
+                latency = int(result.stdout.strip().split('ms')[0].split(':')[-1].strip())
+                return latency
+            except (ValueError, IndexError):
+                return None # اگر پارس کردن شکست خورد
+        
+        # اگر تست ناموفق بود، خطا را چاپ می‌کنیم (برای عیب‌یابی)
         if error_log_count < MAX_ERROR_LOGS:
             sys.stdout.write('\n')
             print(f"DEBUG: Test failed for proxy: {proxy_link[:60]}...")
@@ -73,6 +85,7 @@ def test_single_proxy(proxy_link: str) -> Optional[int]:
             print(f"DEBUG: Sing-box stderr:\n---\n{result.stderr.strip()}\n---")
             error_log_count += 1
         return None
+
     except subprocess.TimeoutExpired:
         if error_log_count < MAX_ERROR_LOGS:
             sys.stdout.write('\n')
@@ -135,8 +148,6 @@ def main():
             healthy_count += 1
             healthy_proxies.append((proxy, latency))
         
-        # --- <<< تغییر اصلی: بهینه‌سازی چاپ خط پیشرفت >>> ---
-        # این خط فقط هر ۱۰۰ پراکسی یک‌بار یا در آخرین پراکسی اجرا می‌شود
         if tested_count % PROGRESS_UPDATE_INTERVAL == 0 or tested_count == total_proxies:
             percentage = (tested_count / total_proxies) * 100
             progress_line = f"🔄 [PROGRESS] Tested: {tested_count}/{total_proxies} ({percentage:.2f}%) | Healthy: {healthy_count}"
