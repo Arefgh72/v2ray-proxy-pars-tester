@@ -19,9 +19,6 @@ OUTPUT_FILES = {
 TEMP_CONFIG_FILE = 'temp_singbox_config.json'
 LOCAL_SOCKS_PORT = 2080
 TEST_URL = 'https://www.youtube.com/'
-
-error_log_count = 0
-MAX_ERROR_LOGS = 10 # فقط ۱۰ خطای اول را با جزئیات کامل چاپ می‌کنیم
 PROGRESS_UPDATE_INTERVAL = 100
 
 def check_singbox_executable() -> bool:
@@ -33,8 +30,8 @@ def check_singbox_executable() -> bool:
     return True
 
 def create_singbox_config(proxy_link: str) -> None:
+    """کانفیگی می‌سازد که یک ورودی SOCKS محلی را به پراکسی مورد تست متصل می‌کند."""
     config = {
-        "log": {"level": "warn"},
         "inbounds": [{
             "type": "socks",
             "tag": "socks-in",
@@ -42,73 +39,55 @@ def create_singbox_config(proxy_link: str) -> None:
             "listen_port": LOCAL_SOCKS_PORT
         }],
         "outbounds": [{
-            "type": "auto",
+            # --- <<< تغییر اصلی و نهایی: استفاده از نوع 'url' >>> ---
+            # این نوع اختصاصاً برای پارس کردن لینک کامل پراکسی طراحی شده است.
+            "type": "url",
             "tag": "proxy-out",
-            "server": proxy_link
+            "url": proxy_link  # کلید 'url' به جای 'server' استفاده می‌شود
         }],
         "routing": {
-            "rules": [{"inbound": ["socks-in"], "outbound": "proxy-out"}]
+            "rules": [{
+                "inbound": ["socks-in"],
+                "outbound": "proxy-out"
+            }]
         }
     }
     with open(TEMP_CONFIG_FILE, 'w') as f:
         json.dump(config, f)
 
 def test_single_proxy(proxy_link: str) -> Optional[int]:
-    global error_log_count
     create_singbox_config(proxy_link)
-    
     singbox_process = None
     try:
         cmd_run = [SING_BOX_EXECUTABLE, 'run', '-c', TEMP_CONFIG_FILE]
-        # --- تغییر کلیدی: گرفتن خروجی خطای sing-box برای دیباگ ---
-        singbox_process = subprocess.Popen(cmd_run, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        time.sleep(0.8)
+        # ما دیگر به خروجی‌های sing-box نیازی نداریم چون کانفیگ صحیح است
+        singbox_process = subprocess.Popen(cmd_run, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(0.5) # نیم ثانیه برای بالا آمدن سرور کافی است
 
         proxy_address = f"socks5h://127.0.0.1:{LOCAL_SOCKS_PORT}"
         cmd_curl = [
-            'curl', '--proxy', proxy_address, '--connect-timeout', '7',
-            '-m', '10', '--head', '--silent', '--output', '/dev/null',
+            'curl', '--proxy', proxy_address, '--connect-timeout', '5', 
+            '-m', '8', '--head', '--silent', '--output', '/dev/null',
             '--write-out', '%{time_total}', TEST_URL
         ]
         
         curl_result = subprocess.run(cmd_curl, capture_output=True, text=True, check=False)
 
         if curl_result.returncode == 0 and curl_result.stdout:
-            singbox_process.kill() # اگر موفق بود، پردازش را ببند
             try:
                 total_time_sec = float(curl_result.stdout.replace(',', '.'))
                 return int(total_time_sec * 1000)
             except (ValueError, IndexError):
                 return None
         
-        # --- <<< بخش کلیدی عیب‌یابی: اگر curl شکست خورد >>> ---
-        if error_log_count < MAX_ERROR_LOGS:
-            singbox_process.kill() # پردازش را ببند تا بتوانی خروجی‌اش را بخوانی
-            singbox_stdout, singbox_stderr = singbox_process.communicate()
-
-            sys.stdout.write('\n')
-            print("="*20 + " DEBUG START " + "="*20)
-            print(f"Proxy: {proxy_link[:80]}...")
-            print(f"CURL Exit Code: {curl_result.returncode}")
-            print(f"CURL Stderr: {curl_result.stderr.strip()}")
-            print(f"Sing-box Stderr: {singbox_stderr.strip()}")
-            print("="*21 + " DEBUG END " + "="*21 + "\n")
-            error_log_count += 1
-        
         return None
-
-    except Exception as e:
-        if error_log_count < MAX_ERROR_LOGS:
-            sys.stdout.write('\n')
-            print(f"DEBUG: A Python exception occurred: {e}")
-            error_log_count += 1
+    except Exception:
         return None
     finally:
-        if singbox_process and singbox_process.poll() is None:
+        if singbox_process:
             singbox_process.kill()
             singbox_process.wait()
 
-# بقیه توابع بدون تغییر هستند
 def save_results_as_base64(sorted_proxies: List[str]) -> None:
     print("\n[INFO] Saving results to output files (Base64 encoded)...")
     all_content = "\n".join(sorted_proxies)
@@ -196,7 +175,6 @@ def main():
         iran_stats={}
     )
     print("\n--- Finished 02_test_proxies.py ---")
-
 
 if __name__ == "__main__":
     main()
