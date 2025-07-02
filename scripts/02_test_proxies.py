@@ -3,28 +3,20 @@ import sys
 import json
 import subprocess
 import base64
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Optional
 
-# --- وارد کردن ماژول لاگر شخصی شما ---
-# این فرض می‌کند که اسکریپت از ریشه پروژه اجرا می‌شود
-try:
-    from scripts.utils import log_error, log_test_summary
-except ImportError:
-    print("CRITICAL: Could not import from scripts.utils. Make sure you run the script from the project root.")
-    sys.exit(1)
+# --- اصلاح اصلی: استفاده از آدرس‌دهی نسبی برای وارد کردن ماژول ---
+# این خط برای حل مشکل ModuleNotFoundError اصلاح شده است.
+from .utils import log_error, log_test_summary
 
 # --- تنظیمات و ثابت‌ها ---
-# مسیر فایل اجرایی sing-box (فرض می‌کنیم در ریشه پروژه قرار خواهد گرفت)
 SING_BOX_EXECUTABLE = './sing-box'
-# فایل ورودی
 RAW_PROXIES_FILE = 'output/raw_proxies.txt'
-# نام فایل‌های خروجی نهایی
 OUTPUT_FILES = {
     'all': 'output/github_all.txt',
     'top_500': 'output/github_top_500.txt',
     'top_100': 'output/github_top_100.txt'
 }
-# فایل کانفیگ موقت برای sing-box
 TEMP_CONFIG_FILE = 'temp_singbox_config.json'
 
 
@@ -45,36 +37,18 @@ def create_singbox_config(proxy_link: str) -> None:
     config = {
         "outbounds": [
             {
-                "type": "urltest",
-                "tag": "url-test-group",
-                "outbounds": [proxy_link],  # تست تنها یک پراکسی در هر زمان
-                "url": "https://www.google.com/generate_204", # یک URL سبک برای تست پینگ
-                "interval": "10m" # فاصله زیاد برای اینکه فقط یکبار تست کند
-            }
-        ]
-    }
-    # برای پراکسی‌های VLESS/VMESS ممکن است نیاز به فیلدهای بیشتری باشد
-    # اما sing-box به اندازه کافی هوشمند است که لینک کامل را پارس کند.
-    # برای سادگی، لینک را مستقیماً به عنوان outbound استفاده می‌کنیم.
-    
-    # کد بالا کار نمی‌کند. باید پراکسی را به عنوان یک outbound مجزا تعریف کرد.
-    # ساختار صحیح کانفیگ:
-    config = {
-        "outbounds": [
-            {
                 "tag": "proxy-to-test",
-                "type": "auto",  # اجازه می‌دهیم sing-box نوع را از روی لینک تشخیص دهد
-                "server": proxy_link # لینک کامل پراکسی
+                "type": "auto",
+                "server": proxy_link
             },
             {
                 "type": "urltest",
                 "tag": "speed-test",
                 "outbounds": ["proxy-to-test"],
-                "url": "http://cp.cloudflare.com/generate_204"
+                "url": "http://cp.cloudflare.com/generate_204" # URL سبک و قابل اعتماد برای تست
             }
         ]
     }
-
     with open(TEMP_CONFIG_FILE, 'w') as f:
         json.dump(config, f)
 
@@ -93,39 +67,34 @@ def test_single_proxy(proxy_link: str) -> Optional[int]:
     ]
 
     try:
-        # اجرای دستور با timeout
         result = subprocess.run(command, capture_output=True, text=True, timeout=15, check=False)
         
         if result.returncode == 0:
             output_lines = result.stdout.strip().split('\n')
-            # دنبال خطی می‌گردیم که شامل پینگ است
             for line in output_lines:
                 if 'ms' in line:
-                    # استخراج عدد پینگ از خط (مثلاً ' proxy-to-test  123 ms')
                     try:
                         latency = int(line.split('ms')[0].strip().split()[-1])
                         return latency
                     except (ValueError, IndexError):
-                        continue # اگر پارس کردن شکست خورد، خط بعدی را امتحان کن
+                        continue
         return None
     except subprocess.TimeoutExpired:
-        return None # پراکسی که تایم‌اوت شود، ناموفق است
-    except Exception:
-        # هر خطای دیگری در اجرای subprocess
+        return None
+    except Exception as e:
+        log_error("Proxy Test", f"Error testing proxy: {proxy_link[:40]}...", str(e))
         return None
 
 def save_results_as_base64(sorted_proxies: List[str]) -> None:
     """نتایج مرتب‌شده را در فایل‌های خروجی با فرمت Base64 ذخیره می‌کند."""
     print("\n[INFO] Saving results to output files (Base64 encoded)...")
 
-    # ذخیره تمام پراکسی‌های سالم
     all_content = "\n".join(sorted_proxies)
     all_base64 = base64.b64encode(all_content.encode('utf-8')).decode('utf-8')
     with open(OUTPUT_FILES['all'], 'w') as f:
         f.write(all_base64)
     print(f"  -> Saved {len(sorted_proxies)} proxies to '{OUTPUT_FILES['all']}'.")
 
-    # ذخیره ۵۰۰ پراکسی برتر
     top_500 = sorted_proxies[:500]
     if top_500:
         top_500_content = "\n".join(top_500)
@@ -134,7 +103,6 @@ def save_results_as_base64(sorted_proxies: List[str]) -> None:
             f.write(top_500_base64)
         print(f"  -> Saved {len(top_500)} proxies to '{OUTPUT_FILES['top_500']}'.")
 
-    # ذخیره ۱۰۰ پراکسی برتر
     top_100 = sorted_proxies[:100]
     if top_100:
         top_100_content = "\n".join(top_100)
@@ -177,13 +145,11 @@ def main():
             healthy_count += 1
             healthy_proxies.append((proxy, latency))
 
-        # --- بخش گزارش‌دهی پیشرفت لحظه‌ای ---
         percentage = (tested_count / total_proxies) * 100
         progress_line = f"🔄 [PROGRESS] Tested: {tested_count}/{total_proxies} ({percentage:.2f}%) | Healthy: {healthy_count}"
         sys.stdout.write('\r' + progress_line)
         sys.stdout.flush()
 
-    # پاک کردن فایل کانفیگ موقت
     if os.path.exists(TEMP_CONFIG_FILE):
         os.remove(TEMP_CONFIG_FILE)
 
@@ -196,11 +162,9 @@ def main():
         print(f"  Success Rate: {success_rate:.2f}%")
     print("-" * 35)
 
+    stats = {'passed_count': 0}
     if healthy_proxies:
-        # مرتب‌سازی بر اساس پینگ (کمتر بهتر است)
         healthy_proxies.sort(key=lambda item: item[1])
-        
-        # استخراج آمار برای لاگ دائمی
         latencies = [item[1] for item in healthy_proxies]
         stats = {
             'passed_count': healthy_count,
@@ -208,29 +172,24 @@ def main():
             'min_latency': min(latencies),
             'max_latency': max(latencies)
         }
-        
-        # ذخیره نتایج در فایل‌های خروجی
         sorted_proxy_links = [item[0] for item in healthy_proxies]
         save_results_as_base64(sorted_proxy_links)
-
     else:
-        # اگر هیچ پراکسی سالمی پیدا نشد
-        stats = {'passed_count': 0}
         print("\n[INFO] No healthy proxies found. Output files will be empty.")
-        # ایجاد فایل‌های خالی برای جلوگیری از خطای 404 در لینک‌های اشتراک
         save_results_as_base64([])
 
-
-    # ثبت خلاصه در لاگ دائمی با استفاده از تابع شما
     log_test_summary(
         cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0),
         raw_count=total_proxies,
         github_stats=stats,
-        iran_stats={}  # این بخش فعلا خالی است
+        iran_stats={}
     )
     
     print("\n--- Finished 02_test_proxies.py ---")
 
+
+if __name__ == "__main__":
+    main()
 
 if __name__ == "__main__":
     main()
