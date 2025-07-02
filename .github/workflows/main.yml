@@ -1,70 +1,29 @@
-# نام ورک‌فلو اصلی: تست کننده پروکسی
-name: V2Ray Proxy Auto Tester
+name: V2Ray Proxy Debugger
 
 on:
-  # هر 3 ساعت یکبار اجرا شود
-  schedule:
-    - cron: '15 */3 * * *' # در دقیقه 15 هر 3 ساعت برای جلوگیری از ترافیک همزمان با دیگران
-  
-  # اجازه اجرای دستی
-  workflow_dispatch:
-
-permissions:
-  contents: write # برای کامیت کردن نتایج تست
+  workflow_dispatch: # فقط اجرای دستی برای دیباگ
 
 jobs:
-  test-and-commit:
+  debug-single-proxy:
     runs-on: ubuntu-latest
     
     steps:
-      # مرحله 1: دریافت کد ریپازیتوری (شامل پوشه base با ابزارها)
-      # ما به `fetch-depth: 0` نیاز داریم تا git بتواند تفاوت‌ها را برای کامیت تشخیص دهد
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # مرحله 2: نصب پایتون
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       
-      # مرحله 3: نصب وابستگی‌های پایتون
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests curl_cffi
+      - name: Install dependencies
+        run: pip install requests
 
-      # مرحله 4: دادن مجوز اجرایی به ابزارهای تست
       - name: Make tools executable
         run: chmod +x ./base/*
-
-      # مرحله 5: اجرای اسکریپت استخراج پروکسی
-      - name: Run Fetch Proxies Script
-        run: python -u scripts/01_fetch_proxies.py
-
-      # مرحله 6: اجرای اسکریپت تست پروکسی (با ابزارهای حرفه‌ای)
-      - name: Run Proxy Tester Script
-        run: python -u scripts/02_test_proxies.py
       
-      # مرحله 7: کامیت و پوش کردن نتایج
-      - name: Commit and push results
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action (Proxy Tester)"
-          
-          # فقط فایل‌های داخل پوشه output را اضافه کن
-          git add -f output/
-          
-          # چک می‌کند که آیا تغییری برای کامیت وجود دارد یا نه
-          if ! git diff --staged --quiet; then
-            # یک پیام کامیت معنادار می‌سازیم
-            COMMIT_MESSAGE="feat(proxies): Update active proxy lists on $(date -u)"
-            PROXY_COUNT=$(cat output/github_all.txt | wc -l)
-            COMMIT_DETAILS="Total active proxies found: $PROXY_COUNT"
-            git commit -m "$COMMIT_MESSAGE" -m "$COMMIT_DETAILS"
-            git push
-          else
-            echo "No changes in proxy lists to commit."
-          fi
+      - name: Run Single Proxy Debug Script
+        env:
+          # --- تغییر اصلی: پروکسی مستقیماً اینجا تعریف شده ---
+          PROXY_TO_TEST: 'vless://7c9e3c1d-a360-4429-9189-e45a98de7fde@[::ffff:45.142.120.8]:443?encryption=none&security=tls&sni=mail.ski1plag.ir&alpn=h2%2Chttp%2F1.1&fp=random&type=ws&host=mail.ski1plag.ir&path=%2Fupload'
+        run: python -u scripts/02_test_proxies.py
