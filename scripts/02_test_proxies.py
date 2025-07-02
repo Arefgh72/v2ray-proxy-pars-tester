@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-import subprocess
+import asyncio
 import base64
 import time
 from typing import List, Tuple, Optional, Dict
@@ -17,12 +17,15 @@ OUTPUT_FILES = {
     'top_500': 'output/github_top_500.txt',
     'top_100': 'output/github_top_100.txt'
 }
-TEMP_CONFIG_FILE = 'temp_singbox_config.json'
-LOCAL_SOCKS_PORT = 2080
-TEST_URL = 'http://cp.cloudflare.com/generate_204'
+TEMP_DIR = 'temp_configs' # پوشه‌ای برای کانفیگ‌های موقت
+LOCAL_SOCKS_PORT_START = 2080 # پورت شروع برای پراکسی‌های محلی
+TEST_URL = 'https://www.youtube.com/'
 PROGRESS_UPDATE_INTERVAL = 100
-# --- سیستم دیباگ دائمی که حذف نخواهد شد ---
-DEBUG_MODE = True
+DEBUG_MODE = False # با حل شدن مشکل اصلی، دیباگ را خاموش می‌کنیم
+
+# --- <<< تنظیمات کلیدی موازی‌سازی >>> ---
+# تعداد پراکسی‌هایی که به صورت همزمان تست می‌شوند
+CONCURRENT_TESTS = 250
 
 def check_singbox_executable() -> bool:
     if not os.path.exists(SING_BOX_EXECUTABLE) or not os.access(SING_BOX_EXECUTABLE, os.X_OK):
@@ -35,44 +38,32 @@ def check_singbox_executable() -> bool:
 def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
     """
     لینک پراکسی را به یک دیکشنری معتبر برای کانفیگ sing-box تجزیه می‌کند.
-    این تابع بر اساس مستندات صحیح sing-box بازنویسی شده است.
     """
     try:
-        if proxy_link.startswith('vmess://'):
-            # VMess به دلیل پیچیدگی در پارس کردن، فعلا برای اطمینان از صحت بقیه کد، رد می‌شود.
-            return None
-
+        if proxy_link.startswith('vmess://'): return None
         parsed = urlparse(proxy_link)
-        
         protocol_map = {
             'ss': 'shadowsocks', 'vless': 'vless', 'trojan': 'trojan',
             'hy': 'hysteria', 'hy2': 'hysteria2'
         }
         protocol = protocol_map.get(parsed.scheme)
         if not protocol: return None
-
         params = parse_qs(parsed.query)
-        outbound_config = {
-            "type": protocol,
-            "tag": "proxy-out",
-            "server": parsed.hostname,
-            "server_port": parsed.port
-        }
+        outbound_config = {"type": protocol, "tag": "proxy-out", "server": parsed.hostname, "server_port": parsed.port}
         
         if protocol == 'vless': outbound_config['uuid'] = parsed.username
         elif protocol == 'trojan': outbound_config['password'] = parsed.username
         elif protocol == 'shadowsocks':
             try:
-                # برخی لینک‌های SS از base64 استاندارد استفاده نمی‌کنند
                 decoded_user = base64.urlsafe_b64decode(parsed.username + '===').decode('utf-8')
                 method, password = decoded_user.split(':', 1)
-                outbound_config['method'] = method
-                outbound_config['password'] = password
-            except: return None # اگر دیکود کردن شکست خورد، پراکسی نامعتبر است
+                outbound_config['method'] = method; outbound_config['password'] = password
+            except: return None
 
-        # --- بازنویسی کامل منطق Transport و TLS ---
+        VALID_TRANSPORT_TYPES = {'ws', 'grpc', 'quic'}
         transport_type = params.get('type', [None])[0]
         if transport_type and transport_type != 'tcp':
+            if transport_type not in VALID_TRANSPORT_TYPES: return None
             transport_config = {"type": transport_type}
             if 'host' in params: transport_config['headers'] = {'Host': params['host'][0]}
             if 'path' in params: transport_config['path'] = params['path'][0]
@@ -82,67 +73,63 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
             tls_config = {"enabled": True}
             if 'sni' in params: tls_config['server_name'] = params['sni'][0]
             if 'allowInsecure' in params and params['allowInsecure'][0] == '1': tls_config['insecure'] = True
-            
-            # اگر transport وجود داشت، tls را داخل آن بگذار، در غیر این صورت در سطح اصلی
-            if 'transport' in outbound_config:
-                outbound_config['transport']['tls'] = tls_config
-            else:
-                outbound_config['tls'] = tls_config
+            if 'transport' in outbound_config: outbound_config['transport']['tls'] = tls_config
+            else: outbound_config['tls'] = tls_config
         
         return outbound_config
     except Exception:
         return None
 
-
-def create_singbox_config(outbound_config: Dict) -> None:
+def create_singbox_config(outbound_config: Dict, port: int, temp_file_path: str) -> None:
     config = {
-        "inbounds": [{"type": "socks", "listen": "127.0.0.1", "listen_port": LOCAL_SOCKS_PORT, "tag": "socks-in"}],
+        "inbounds": [{"type": "socks", "listen": "127.0.0.1", "listen_port": port, "tag": "socks-in"}],
         "outbounds": [outbound_config],
         "route": {"rules": [{"inbound": ["socks-in"], "outbound": "proxy-out"}]}
     }
-    with open(TEMP_CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(config, f, indent=2)
+    with open(temp_file_path, 'w', encoding='utf-8') as f:
+        json.dump(config, f)
 
-
-def test_single_proxy(proxy_link: str) -> Optional[int]:
+async def test_single_proxy_async(proxy_index: int, proxy_link: str) -> Optional[Tuple[str, int]]:
+    """
+    نسخه async برای تست یک پراکسی. هر کدام روی پورت و با کانفیگ مجزای خود اجرا می‌شوند.
+    """
     outbound_config = parse_proxy_link(proxy_link)
     if not outbound_config: return None
-    create_singbox_config(outbound_config)
+    
+    port = LOCAL_SOCKS_PORT_START + proxy_index
+    temp_file_path = os.path.join(TEMP_DIR, f'config_{proxy_index}.json')
+    create_singbox_config(outbound_config, port, temp_file_path)
+    
     singbox_process = None
     try:
-        cmd_run = [SING_BOX_EXECUTABLE, 'run', '-c', TEMP_CONFIG_FILE]
-        singbox_process = subprocess.Popen(cmd_run, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, universal_newlines=True)
-        time.sleep(0.5)
+        cmd_run = [SING_BOX_EXECUTABLE, 'run', '-c', temp_file_path]
+        singbox_process = await asyncio.create_subprocess_exec(*cmd_run, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
+        await asyncio.sleep(0.5)
 
-        proxy_address = f"socks5h://127.0.0.1:{LOCAL_SOCKS_PORT}"
+        proxy_address = f"socks5h://127.0.0.1:{port}"
         cmd_curl = ['curl', '--proxy', proxy_address, '--connect-timeout', '5', '-m', '8', '--head', '--silent', '--output', '/dev/null', '--write-out', '%{time_total}', TEST_URL]
-        curl_result = subprocess.run(cmd_curl, capture_output=True, text=True, check=False)
-        singbox_process.kill()
+        
+        proc_curl = await asyncio.create_subprocess_exec(*cmd_curl, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        stdout, _ = await proc_curl.communicate()
 
-        if curl_result.returncode == 0 and curl_result.stdout:
-            try: return int(float(curl_result.stdout.replace(',', '.')) * 1000)
-            except: return None
-        
-        if DEBUG_MODE:
-            _, singbox_stderr = singbox_process.communicate(timeout=2)
-            if "FATAL" in singbox_stderr or "level=fatal" in singbox_stderr:
-                sys.stdout.write('\n')
-                print("="*20 + " DEBUG INFO " + "="*20)
-                print(f"Proxy: {proxy_link[:80]}...")
-                print(f"CURL Exit Code: {curl_result.returncode} | CURL Stderr: {curl_result.stderr.strip()}")
-                if singbox_stderr: print(f"Sing-box Stderr: {singbox_stderr.strip()}")
-                # چاپ کانفیگ تولید شده برای خطایابی دقیق
-                print(f"Generated Config:\n{json.dumps(outbound_config, indent=2)}")
-                print("="*21 + " DEBUG END " + "="*22 + "\n")
-        
+        if proc_curl.returncode == 0 and stdout:
+            try:
+                latency = int(float(stdout.decode().replace(',', '.')) * 1000)
+                return proxy_link, latency
+            except (ValueError, IndexError):
+                return None
         return None
-    except Exception: return None
+    except asyncio.CancelledError:
+        return None
+    except Exception:
+        return None
     finally:
-        if singbox_process and singbox_process.poll() is None:
+        if singbox_process:
             singbox_process.kill()
-            singbox_process.wait()
+            await singbox_process.wait()
 
 def save_results_as_base64(sorted_proxies: List[str]) -> None:
+    # ... (کد بدون تغییر)
     print("\n[INFO] Saving results to output files (Base64 encoded)...")
     all_content = "\n".join(sorted_proxies)
     all_base64 = base64.b64encode(all_content.encode('utf-8')).decode('utf-8')
@@ -164,10 +151,15 @@ def save_results_as_base64(sorted_proxies: List[str]) -> None:
             f.write(top_100_base64)
         print(f"  -> Saved {len(top_100)} proxies to '{OUTPUT_FILES['top_100']}'.")
 
-def main():
-    print("\n--- Running 02_test_proxies.py ---")
-    if not check_singbox_executable():
-        sys.exit(1)
+async def main_async():
+    """
+    تابع اصلی که تمام فرآیند را به صورت موازی مدیریت می‌کند.
+    """
+    print("\n--- Running 02_test_proxies.py (Parallel Mode) ---")
+    if not check_singbox_executable(): sys.exit(1)
+    
+    os.makedirs(TEMP_DIR, exist_ok=True)
+
     try:
         with open(RAW_PROXIES_FILE, 'r') as f:
             proxies_to_test = [line.strip() for line in f if line.strip()]
@@ -175,60 +167,58 @@ def main():
         print(f"❌ ERROR: Input file not found: '{RAW_PROXIES_FILE}'.")
         log_error("Test Proxies", f"Input file '{RAW_PROXIES_FILE}' not found.")
         return
+
     total_proxies = len(proxies_to_test)
-    if total_proxies == 0:
-        print("No proxies to test.")
-        return
-    print(f"[INFO] Starting test for {total_proxies} proxies...")
+    if total_proxies == 0: print("No proxies to test."); return
+    print(f"[INFO] Starting parallel test for {total_proxies} proxies with {CONCURRENT_TESTS} workers...")
+
     healthy_proxies: List[Tuple[str, int]] = []
+    
+    semaphore = asyncio.Semaphore(CONCURRENT_TESTS)
     tested_count = 0
-    healthy_count = 0
-    for proxy in proxies_to_test:
-        tested_count += 1
-        latency = test_single_proxy(proxy)
-        if latency is not None:
-            healthy_count += 1
-            healthy_proxies.append((proxy, latency))
-        
-        if tested_count % PROGRESS_UPDATE_INTERVAL == 0 or tested_count == total_proxies:
-            percentage = (tested_count / total_proxies) * 100
-            progress_line = f"🔄 [PROGRESS] Tested: {tested_count}/{total_proxies} ({percentage:.2f}%) | Healthy: {healthy_count}"
-            sys.stdout.write('\r' + progress_line)
-            sys.stdout.flush()
+    
+    async def worker(proxy_index, proxy_link):
+        nonlocal tested_count
+        async with semaphore:
+            result = await test_single_proxy_async(proxy_index, proxy_link)
+            if result:
+                healthy_proxies.append(result)
+            tested_count += 1
+            if tested_count % PROGRESS_UPDATE_INTERVAL == 0 or tested_count == total_proxies:
+                percentage = (tested_count / total_proxies) * 100
+                progress_line = f"🔄 [PROGRESS] Tested: {tested_count}/{total_proxies} ({percentage:.2f}%) | Healthy: {len(healthy_proxies)}"
+                sys.stdout.write('\r' + progress_line)
+                sys.stdout.flush()
 
-    if os.path.exists(TEMP_CONFIG_FILE):
-        os.remove(TEMP_CONFIG_FILE)
+    tasks = [worker(i, proxy) for i, proxy in enumerate(proxies_to_test)]
+    await asyncio.gather(*tasks)
 
+    # پاکسازی فایل‌های موقت
+    for item in os.listdir(TEMP_DIR):
+        os.remove(os.path.join(TEMP_DIR, item))
+    os.rmdir(TEMP_DIR)
+    
     print("\n\n📊 [SUMMARY] Test Complete.")
     print("-" * 35)
     print(f"  Total Proxies Scanned: {total_proxies}")
-    print(f"  Total Healthy Proxies: {healthy_count}")
+    print(f"  Total Healthy Proxies: {len(healthy_proxies)}")
     if total_proxies > 0:
-        success_rate = (healthy_count / total_proxies) * 100
+        success_rate = (len(healthy_proxies) / total_proxies) * 100
         print(f"  Success Rate: {success_rate:.2f}%")
     print("-" * 35)
     stats = {'passed_count': 0}
     if healthy_proxies:
         healthy_proxies.sort(key=lambda item: item[1])
         latencies = [item[1] for item in healthy_proxies]
-        stats = {
-            'passed_count': healthy_count,
-            'avg_latency': sum(latencies) / len(latencies),
-            'min_latency': min(latencies),
-            'max_latency': max(latencies)
-        }
+        stats = {'passed_count': len(healthy_proxies), 'avg_latency': sum(latencies) / len(latencies), 'min_latency': min(latencies), 'max_latency': max(latencies)}
         sorted_proxy_links = [item[0] for item in healthy_proxies]
         save_results_as_base64(sorted_proxy_links)
     else:
         print("\n[INFO] No healthy proxies found. Output files will be empty.")
         save_results_as_base64([])
-    log_test_summary(
-        cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0),
-        raw_count=total_proxies,
-        github_stats=stats,
-        iran_stats={}
-    )
+    log_test_summary(cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0), raw_count=total_proxies, github_stats=stats, iran_stats={})
     print("\n--- Finished 02_test_proxies.py ---")
 
+
 if __name__ == "__main__":
-    main()
+    asyncio.run(main_async())
