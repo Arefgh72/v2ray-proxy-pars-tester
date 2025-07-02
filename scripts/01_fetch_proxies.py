@@ -2,7 +2,7 @@
 from curl_cffi.requests import get
 import base64
 import os
-from utils import log_error
+from .utils import log_error
 
 SUBSCRIPTIONS_FILE_PATH = 'config/subscriptions.txt'
 RAW_PROXIES_OUTPUT_PATH = 'output/raw_proxies.txt'
