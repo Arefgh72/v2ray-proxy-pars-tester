@@ -1,39 +1,98 @@
-name: V2Ray Proxy Auto Tester
+# نام ورک‌فلو که در بخش Actions گیت‌هاب نمایش داده می‌شود
+name: Fetch and Test Proxies CI
+
+# --- تریگرها: چه زمانی این ورک‌فلو اجرا شود ---
 on:
-  schedule:
-    - cron: '15 */3 * * *'
+  # قابلیت اجرای دستی از طریق صفحه Actions گیت‌هاب
   workflow_dispatch:
-permissions:
-  contents: write
+
+  # اجرای زمان‌بندی شده
+  schedule:
+    # این کد هر 3 ساعت یک‌بار اجرا می‌شود (در ساعت 0, 3, 6, 9, ...)
+    - cron: '0 */3 * * *'
+
+# --- تعریف کارها (Jobs) ---
 jobs:
-  test-and-commit:
+  # ما فقط یک کار اصلی به نام update-proxies داریم
+  update-proxies:
+    # این کار روی یک ماشین مجازی اوبونتو آخرین نسخه اجرا می‌شود
     runs-on: ubuntu-latest
+
+    # --- مراحل اجرای کار ---
     steps:
-      - uses: actions/checkout@v4
+      # مرحله 1: دریافت کد از مخزن گیت‌هاب شما
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # مرحله 2: نصب ابزار کلیدی تست (Sing-box)
+      # این بخش به صورت داینامیک آخرین نسخه را پیدا، دانلود و نصب می‌کند
+      - name: Install and Setup Sing-box
+        run: |
+          echo "Fetching latest Sing-box version..."
+          # دریافت آخرین تگ نسخه (مثلا v1.9.1) از API گیت‌هاب
+          LATEST_TAG=$(curl -s "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          if [ -z "$LATEST_TAG" ]; then
+              echo "Failed to fetch latest tag. Exiting."
+              exit 1
+          fi
+          echo "Latest version tag is: $LATEST_TAG"
+
+          # ساختن URL دانلود بر اساس نسخه و معماری لینوکس
+          DOWNLOAD_URL="https://github.com/SagerNet/sing-box/releases/download/${LATEST_TAG}/sing-box-${LATEST_TAG#v}-linux-amd64.tar.gz"
+          echo "Downloading from: $DOWNLOAD_URL"
+          
+          # دانلود فایل
+          curl -L -o sing-box.tar.gz "$DOWNLOAD_URL"
+          
+          # از حالت فشرده خارج کردن و انتقال فایل اجرایی
+          tar -xzf sing-box.tar.gz
+          # فایل اجرایی داخل پوشه‌ای با همان نام نسخه است
+          mv sing-box-*/sing-box .
+          
+          # دادن دسترسی اجرایی به فایل
+          chmod +x ./sing-box
+          
+          echo "Sing-box setup complete. Version info:"
+          # نمایش نسخه برای اطمینان از نصب صحیح
+          ./sing-box version
+
+      # مرحله 3: راه‌اندازی محیط پایتون
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
+          # شما می‌توانید نسخه پایتون را به دلخواه تغییر دهید
           python-version: '3.10'
-      - name: Install dependencies
+
+      # مرحله 4: نصب کتابخانه‌های پایتون
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests curl_cffi PySocks
-      - name: Make tools executable
-        run: chmod +x ./base/*
-      - run: python -u scripts/01_fetch_proxies.py
-      - run: python -u scripts/02_test_proxies.py
-      - name: Commit and push results
+          # نصب تمام موارد مورد نیاز از فایل requirements.txt
+          pip install -r requirements.txt
+
+      # مرحله 5: اجرای اسکریپت‌ها به ترتیب
+      - name: Run 01_fetch_proxies.py
+        run: python scripts/01_fetch_proxies.py
+
+      - name: Run 02_test_proxies.py
+        run: python scripts/02_test_proxies.py
+
+      # مرحله 6: کامیت و پوش کردن فایل‌های خروجی به مخزن
+      - name: Commit and Push Results
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action (Proxy Tester)"
-          git add -f output/
-          if ! git diff --staged --quiet; then
-            COMMIT_MESSAGE="feat(proxies): Update active proxy lists on $(date -u)"
-            PROXY_COUNT=$(cat output/github_all.txt 2>/dev/null | wc -l)
-            COMMIT_DETAILS="Total active proxies: $PROXY_COUNT"
-            git commit -m "$COMMIT_MESSAGE" -m "$COMMIT_DETAILS"
-            git push
-          else
-            echo "No changes to commit."
-          fi
+          # تنظیم هویت گیت برای کامیت زدن
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # اضافه کردن تمام تغییرات در پوشه output به استیج گیت
+          git add output/
+          
+          # ساخت یک پیام کامیت پویا با تاریخ و ساعت
+          COMMIT_MESSAGE="✅ Auto-Update: Proxy lists refreshed at $(date -u)"
+          
+          # کامیت زدن تغییرات. اگر تغییری وجود نداشته باشد، این دستور خطا نمی‌دهد
+          # و با کمک '|| ...' ادامه ورک‌فلو تضمین می‌شود.
+          git commit -m "$COMMIT_MESSAGE" || echo "No changes to commit."
+          
+          # پوش کردن تغییرات به برنچ اصلی (main)
+          git push
