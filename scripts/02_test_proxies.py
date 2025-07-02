@@ -3,6 +3,7 @@ import sys
 import json
 import subprocess
 import base64
+import time
 from typing import List, Tuple, Optional
 
 from .utils import log_error, log_test_summary
@@ -16,37 +17,42 @@ OUTPUT_FILES = {
     'top_100': 'output/github_top_100.txt'
 }
 TEMP_CONFIG_FILE = 'temp_singbox_config.json'
+LOCAL_SOCKS_PORT = 2080 # یک پورت برای پراکسی محلی
+TEST_URL = 'http://cp.cloudflare.com/generate_204' # URL سبک برای تست
+
 error_log_count = 0
-MAX_ERROR_LOGS = 20
+MAX_ERROR_LOGS = 5 # تعداد لاگ‌های دیباگ را کم می‌کنیم
 PROGRESS_UPDATE_INTERVAL = 100
 
 def check_singbox_executable() -> bool:
-    if not os.path.exists(SING_BOX_EXECUTABLE):
-        print(f"❌ CRITICAL: '{SING_BOX_EXECUTABLE}' not found.")
-        log_error("Test Setup", f"Sing-box executable not found at '{SING_BOX_EXECUTABLE}'.")
-        return False
-    if not os.access(SING_BOX_EXECUTABLE, os.X_OK):
-        print(f"❌ CRITICAL: '{SING_BOX_EXECUTABLE}' is not executable.")
-        log_error("Test Setup", f"Sing-box is not executable.")
+    if not os.path.exists(SING_BOX_EXECUTABLE) or not os.access(SING_BOX_EXECUTABLE, os.X_OK):
+        msg = f"Sing-box executable not found or not executable at '{SING_BOX_EXECUTABLE}'"
+        print(f"❌ CRITICAL: {msg}")
+        log_error("Test Setup", msg)
         return False
     return True
 
 def create_singbox_config(proxy_link: str) -> None:
-    # این کانفیگ درست است. ما یک outbound برای تست داریم با تگ speed-test
+    """کانفیگی می‌سازد که یک ورودی SOCKS محلی را به پراکسی مورد تست متصل می‌کند."""
     config = {
-        "outbounds": [
-            {
-                "tag": "proxy-to-test",
-                "type": "auto",
-                "server": proxy_link
-            },
-            {
-                "type": "urltest",
-                "tag": "speed-test",
-                "outbounds": ["proxy-to-test"],
-                "url": "http://cp.cloudflare.com/generate_204"
-            }
-        ]
+        "log": {"level": "warn"},
+        "inbounds": [{
+            "type": "socks",
+            "tag": "socks-in",
+            "listen": "127.0.0.1",
+            "listen_port": LOCAL_SOCKS_PORT
+        }],
+        "outbounds": [{
+            "type": "auto",
+            "tag": "proxy-out",
+            "server": proxy_link
+        }],
+        "routing": {
+            "rules": [{
+                "inbound": ["socks-in"],
+                "outbound": "proxy-out"
+            }]
+        }
     }
     with open(TEMP_CONFIG_FILE, 'w') as f:
         json.dump(config, f)
@@ -54,52 +60,54 @@ def create_singbox_config(proxy_link: str) -> None:
 def test_single_proxy(proxy_link: str) -> Optional[int]:
     global error_log_count
     create_singbox_config(proxy_link)
-
-    # --- <<< تغییر اصلی و نهایی: استفاده از دستور صحیح sing-box >>> ---
-    # دستور صحیح 'measure' است، نه 'url-test'.
-    # ما باید outbound ای که می‌خواهیم تست شود را هم مشخص کنیم (-outbound speed-test).
-    command = [
-        SING_BOX_EXECUTABLE,
-        'measure',
-        '-config', TEMP_CONFIG_FILE,
-        '-outbound', 'speed-test' # این خط به sing-box می‌گوید کدام outbound را تست کند
-    ]
-
+    
+    # --- <<< تغییر اصلی: اجرای sing-box به عنوان سرور در پس‌زمینه >>> ---
+    singbox_process = None
     try:
-        result = subprocess.run(command, capture_output=True, text=True, timeout=15, check=False)
+        # دستور صحیح برای اجرای سرور
+        cmd_run = [SING_BOX_EXECUTABLE, 'run', '-c', TEMP_CONFIG_FILE]
+        singbox_process = subprocess.Popen(cmd_run, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
-        # خروجی موفق دستور measure معمولا یک خط حاوی پینگ است
-        if result.returncode == 0 and 'ms' in result.stdout:
+        # کمی صبر می‌کنیم تا سرور بالا بیاید
+        time.sleep(0.8)
+
+        # --- استفاده از curl برای تست پراکسی محلی ---
+        proxy_address = f"socks5h://127.0.0.1:{LOCAL_SOCKS_PORT}"
+        cmd_curl = [
+            'curl',
+            '--proxy', proxy_address,
+            '--connect-timeout', '7', # ۷ ثانیه برای اتصال
+            '-m', '10', # حداکثر ۱۰ ثانیه برای کل عملیات
+            '--head', # فقط هدرها را بگیر، سریعتر است
+            '--silent', # هیچ خروجی‌ای چاپ نکن
+            '--output', '/dev/null', # خروجی را دور بریز
+            '--write-out', '%{time_total}', # فقط زمان کل را چاپ کن
+            TEST_URL
+        ]
+        
+        result = subprocess.run(cmd_curl, capture_output=True, text=True, check=False)
+
+        # اگر curl موفق بود (کد بازگشتی 0) و خروجی داشت
+        if result.returncode == 0 and result.stdout:
             try:
-                # خروجی چیزی شبیه "delay: 123ms" است
-                latency = int(result.stdout.strip().split('ms')[0].split(':')[-1].strip())
-                return latency
+                # تبدیل زمان از ثانیه به میلی‌ثانیه
+                total_time_sec = float(result.stdout.replace(',', '.'))
+                return int(total_time_sec * 1000)
             except (ValueError, IndexError):
-                return None # اگر پارس کردن شکست خورد
+                return None
         
-        # اگر تست ناموفق بود، خطا را چاپ می‌کنیم (برای عیب‌یابی)
-        if error_log_count < MAX_ERROR_LOGS:
-            sys.stdout.write('\n')
-            print(f"DEBUG: Test failed for proxy: {proxy_link[:60]}...")
-            print(f"DEBUG: Sing-box stdout:\n---\n{result.stdout.strip()}\n---")
-            print(f"DEBUG: Sing-box stderr:\n---\n{result.stderr.strip()}\n---")
-            error_log_count += 1
-        return None
+        return None # اگر curl ناموفق بود
 
-    except subprocess.TimeoutExpired:
-        if error_log_count < MAX_ERROR_LOGS:
-            sys.stdout.write('\n')
-            print(f"DEBUG: Timeout expired for proxy: {proxy_link[:60]}...")
-            error_log_count += 1
+    except Exception:
+        # هر خطای دیگری در این فرآیند
         return None
-    except Exception as e:
-        if error_log_count < MAX_ERROR_LOGS:
-            sys.stdout.write('\n')
-            print(f"DEBUG: Subprocess error for proxy: {proxy_link[:60]}... Error: {e}")
-            error_log_count += 1
-        log_error("Proxy Test", f"Error testing proxy: {proxy_link[:40]}...", str(e))
-        return None
+    finally:
+        # --- بسیار مهم: اطمینان از بسته شدن پردازش sing-box ---
+        if singbox_process:
+            singbox_process.kill()
+            singbox_process.wait()
 
+# بقیه توابع (save_results_as_base64 و main) بدون تغییر باقی می‌مانند
 def save_results_as_base64(sorted_proxies: List[str]) -> None:
     print("\n[INFO] Saving results to output files (Base64 encoded)...")
     all_content = "\n".join(sorted_proxies)
@@ -187,6 +195,7 @@ def main():
         iran_stats={}
     )
     print("\n--- Finished 02_test_proxies.py ---")
+
 
 if __name__ == "__main__":
     main()
