@@ -4,11 +4,12 @@ import json
 import subprocess
 import base64
 import time
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
+from urllib.parse import urlparse, parse_qs
 
 from .utils import log_error, log_test_summary
 
-# --- تنظیمات اصلی ---
+# --- تنظیمات ---
 SING_BOX_EXECUTABLE = './sing-box'
 RAW_PROXIES_FILE = 'output/raw_proxies.txt'
 OUTPUT_FILES = {
@@ -20,8 +21,6 @@ TEMP_CONFIG_FILE = 'temp_singbox_config.json'
 LOCAL_SOCKS_PORT = 2080
 TEST_URL = 'https://www.youtube.com/'
 PROGRESS_UPDATE_INTERVAL = 100
-
-# --- سیستم دیباگ دائمی و قابل کنترل ---
 DEBUG_MODE = True
 
 def check_singbox_executable() -> bool:
@@ -32,86 +31,112 @@ def check_singbox_executable() -> bool:
         return False
     return True
 
-def create_singbox_config(proxy_link: str) -> bool:
+def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
     """
-    کانفیگ sing-box را به صورت پویا بر اساس نوع پروتکل پراکسی ایجاد می‌کند.
-    در صورت موفقیت True و در غیر این صورت False برمی‌گرداند.
+    لینک پراکسی را به یک دیکشنری معتبر برای کانفیگ sing-box تجزیه می‌کند.
+    این تابع بازنویسی شده تا بر اساس مستندات واقعی کار کند.
     """
-    protocol_type = None
-    if proxy_link.startswith('vless://'):
-        protocol_type = 'vless'
-    elif proxy_link.startswith('vmess://'):
-        protocol_type = 'vmess'
-    elif proxy_link.startswith('trojan://'):
-        protocol_type = 'trojan'
-    elif proxy_link.startswith('ss://'):
-        protocol_type = 'shadowsocks'
-    elif proxy_link.startswith('hy2://') or proxy_link.startswith('hysteria2://'):
-        protocol_type = 'hysteria2'
-    elif proxy_link.startswith('hy://') or proxy_link.startswith('hysteria://'):
-        protocol_type = 'hysteria'
-    
-    if not protocol_type:
-        return False # پروتکل ناشناخته، نمی‌توان تست کرد
+    try:
+        if proxy_link.startswith('vmess://'):
+            try:
+                decoded_link = base64.b64decode(proxy_link.replace('vmess://', '')).decode('utf-8')
+                vmess_config = json.loads(decoded_link)
+                config = {
+                    "type": "vmess", "tag": "proxy-out",
+                    "server": vmess_config.get('add'),
+                    "server_port": int(vmess_config.get('port', 443)),
+                    "uuid": vmess_config.get('id'),
+                    "security": vmess_config.get('scy', 'auto'),
+                    "alter_id": int(vmess_config.get('aid', 0))
+                }
+                if vmess_config.get('net') and vmess_config.get('net') != 'tcp':
+                    config['transport'] = {
+                        "type": vmess_config.get('net'),
+                        "path": vmess_config.get('path'),
+                        "headers": {"Host": vmess_config.get('host')} if vmess_config.get('host') else None
+                    }
+                if vmess_config.get('tls') == 'tls':
+                    config.setdefault('transport', {})['tls'] = {"enabled": True, "server_name": vmess_config.get('sni', vmess_config.get('host'))}
+                return config
+            except: return None # اگر پارس کردن vmess شکست خورد
+        
+        parsed = urlparse(proxy_link)
+        protocol = parsed.scheme
+        if protocol not in ['vless', 'trojan', 'ss', 'hysteria', 'hy2', 'hysteria2']: return None
+        
+        params = parse_qs(parsed.query)
+        outbound_config = {
+            "type": "hysteria2" if protocol in ['hy2', 'hysteria2'] else ('hysteria' if protocol == 'hy' else protocol),
+            "tag": "proxy-out", "server": parsed.hostname, "server_port": parsed.port
+        }
+        
+        if protocol in ['vless', 'trojan']:
+            outbound_config['uuid' if protocol == 'vless' else 'password'] = parsed.username
+        elif protocol == 'ss':
+            #
+            decoded_user = base64.urlsafe_b64decode(parsed.username + '===').decode('utf-8')
+            method, password = decoded_user.split(':', 1)
+            outbound_config['method'] = method
+            outbound_config['password'] = password
 
+        transport_config = {}
+        if 'type' in params and params['type'][0] == 'ws':
+            transport_config['type'] = 'ws'
+            if 'path' in params: transport_config['path'] = params['path'][0]
+            if 'host' in params: transport_config['headers'] = {'Host': params['host'][0]}
+        
+        if 'security' in params and params['security'][0] == 'tls':
+            transport_config.setdefault('tls', {})['enabled'] = True
+            if 'sni' in params: transport_config.setdefault('tls', {})['server_name'] = params['sni'][0]
+            if 'allowInsecure' in params and params['allowInsecure'][0] == '1': transport_config.setdefault('tls', {})['insecure'] = True
+            if 'alpn' in params: transport_config.setdefault('tls', {})['alpn'] = params['alpn'][0].split(',')
+
+        if transport_config: outbound_config['transport'] = transport_config
+        
+        return outbound_config
+    except Exception:
+        return None
+
+def create_singbox_config(outbound_config: Dict) -> None:
     config = {
         "inbounds": [{"type": "socks", "listen": "127.0.0.1", "listen_port": LOCAL_SOCKS_PORT, "tag": "socks-in"}],
-        "outbounds": [{
-            "type": protocol_type, # <<< این بخش کلیدی و صحیح است >>>
-            "tag": "proxy-out",
-            "url": proxy_link
-        }],
+        "outbounds": [outbound_config],
         "routing": {"rules": [{"inbound": ["socks-in"], "outbound": "proxy-out"}]}
     }
     with open(TEMP_CONFIG_FILE, 'w') as f:
         json.dump(config, f)
-    return True
 
 def test_single_proxy(proxy_link: str) -> Optional[int]:
-    # اگر نتوان برای پراکسی کانفیگ ساخت، آن را رد کن
-    if not create_singbox_config(proxy_link):
-        return None
-
+    outbound_config = parse_proxy_link(proxy_link)
+    if not outbound_config: return None
+    create_singbox_config(outbound_config)
     singbox_process = None
     try:
         cmd_run = [SING_BOX_EXECUTABLE, 'run', '-c', TEMP_CONFIG_FILE]
-        singbox_process = subprocess.Popen(cmd_run, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        singbox_process = subprocess.Popen(cmd_run, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, universal_newlines=True)
         time.sleep(0.5)
 
         proxy_address = f"socks5h://127.0.0.1:{LOCAL_SOCKS_PORT}"
-        cmd_curl = [
-            'curl', '--proxy', proxy_address, '--connect-timeout', '5', 
-            '-m', '8', '--head', '--silent', '--output', '/dev/null',
-            '--write-out', '%{time_total}', TEST_URL
-        ]
-        
+        cmd_curl = ['curl', '--proxy', proxy_address, '--connect-timeout', '5', '-m', '8', '--head', '--silent', '--output', '/dev/null', '--write-out', '%{time_total}', TEST_URL]
         curl_result = subprocess.run(cmd_curl, capture_output=True, text=True, check=False)
-
-        # اولین کاری که می‌کنیم، بستن پردازش sing-box است
         singbox_process.kill()
 
         if curl_result.returncode == 0 and curl_result.stdout:
-            try:
-                total_time_sec = float(curl_result.stdout.replace(',', '.'))
-                return int(total_time_sec * 1000)
-            except (ValueError, IndexError):
-                return None
+            try: return int(float(curl_result.stdout.replace(',', '.')) * 1000)
+            except: return None
         
-        # اگر تست شکست خورد، لاگ دیباگ را نشان بده
         if DEBUG_MODE:
-            singbox_stdout, singbox_stderr = singbox_process.communicate(timeout=2)
-            sys.stdout.write('\n')
-            print("="*20 + " DEBUG INFO " + "="*20)
-            print(f"Proxy: {proxy_link[:80]}...")
-            print(f"CURL Exit Code: {curl_result.returncode} | CURL Stderr: {curl_result.stderr.strip()}")
-            # فقط در صورتی لاگ sing-box را نشان بده که چیزی برای گفتن داشته باشد
-            if singbox_stderr:
-                print(f"Sing-box Stderr: {singbox_stderr.strip()}")
-            print("="*21 + " DEBUG END " + "="*22 + "\n")
+            _, singbox_stderr = singbox_process.communicate(timeout=2)
+            if "FATAL" in singbox_stderr or "level=fatal" in singbox_stderr:
+                sys.stdout.write('\n')
+                print("="*20 + " DEBUG INFO " + "="*20)
+                print(f"Proxy: {proxy_link[:80]}...")
+                print(f"CURL Exit Code: {curl_result.returncode} | CURL Stderr: {curl_result.stderr.strip()}")
+                if singbox_stderr: print(f"Sing-box Stderr: {singbox_stderr.strip()}")
+                print("="*21 + " DEBUG END " + "="*22 + "\n")
         
         return None
-    except Exception:
-        return None
+    except Exception: return None
     finally:
         if singbox_process and singbox_process.poll() is None:
             singbox_process.kill()
