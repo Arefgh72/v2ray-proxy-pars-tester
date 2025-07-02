@@ -1,125 +1,236 @@
 import os
-import subprocess
+import sys
 import json
-import time
-import threading
-from urllib.parse import urlparse
-from scripts.xray_config_builder import build_xray_config
-from scripts.hysteria_config_builder import build_hysteria_config
-from utils import log_error
-import socket
-import socks # PySocks library
+import subprocess
+import base64
+from typing import List, Tuple, Optional, Dict
 
-# ... (تنظیمات مثل قبل) ...
-XRAY_CORE_PATH = './base/xray-core'
-HYSTERIA_CLIENT_PATH = './base/hysteria-client'
-# ما به یک هاست و پورت برای تست اتصال TCP نیاز داریم، نه یک URL کامل
-TEST_HOST = 'www.google.com'
-TEST_PORT = 443
-TIMEOUT_SECONDS = 15
-MAX_LATENCY_MS = 5000
+# --- وارد کردن ماژول لاگر شخصی شما ---
+# این فرض می‌کند که اسکریپت از ریشه پروژه اجرا می‌شود
+try:
+    from scripts.utils import log_error, log_test_summary
+except ImportError:
+    print("CRITICAL: Could not import from scripts.utils. Make sure you run the script from the project root.")
+    sys.exit(1)
 
-tested_proxies_count = 0
-total_proxies_to_test = 0
-progress_lock = threading.Lock()
+# --- تنظیمات و ثابت‌ها ---
+# مسیر فایل اجرایی sing-box (فرض می‌کنیم در ریشه پروژه قرار خواهد گرفت)
+SING_BOX_EXECUTABLE = './sing-box'
+# فایل ورودی
+RAW_PROXIES_FILE = 'output/raw_proxies.txt'
+# نام فایل‌های خروجی نهایی
+OUTPUT_FILES = {
+    'all': 'output/github_all.txt',
+    'top_500': 'output/github_top_500.txt',
+    'top_100': 'output/github_top_100.txt'
+}
+# فایل کانفیگ موقت برای sing-box
+TEMP_CONFIG_FILE = 'temp_singbox_config.json'
 
-def test_single_proxy(proxy_url: str) -> int:
-    thread_id = threading.get_ident()
-    protocol = urlparse(proxy_url).scheme
-    config_path = f"output/temp_config_{thread_id}.json"
-    local_port = 20000 + thread_id
-    process = None
+
+def check_singbox_executable() -> bool:
+    """بررسی می‌کند که آیا فایل اجرایی sing-box وجود دارد و قابل اجراست یا نه."""
+    if not os.path.exists(SING_BOX_EXECUTABLE):
+        print(f"❌ CRITICAL: '{SING_BOX_EXECUTABLE}' not found. Please download it and place it in the project root.")
+        log_error("Test Setup", f"Sing-box executable not found at '{SING_BOX_EXECUTABLE}'.")
+        return False
+    if not os.access(SING_BOX_EXECUTABLE, os.X_OK):
+        print(f"❌ CRITICAL: '{SING_BOX_EXECUTABLE}' is not executable. Please run 'chmod +x {SING_BOX_EXECUTABLE}'.")
+        log_error("Test Setup", f"Sing-box is not executable.")
+        return False
+    return True
+
+def create_singbox_config(proxy_link: str) -> None:
+    """یک فایل کانفیگ موقت JSON برای تست یک پراکسی توسط sing-box ایجاد می‌کند."""
+    config = {
+        "outbounds": [
+            {
+                "type": "urltest",
+                "tag": "url-test-group",
+                "outbounds": [proxy_link],  # تست تنها یک پراکسی در هر زمان
+                "url": "https://www.google.com/generate_204", # یک URL سبک برای تست پینگ
+                "interval": "10m" # فاصله زیاد برای اینکه فقط یکبار تست کند
+            }
+        ]
+    }
+    # برای پراکسی‌های VLESS/VMESS ممکن است نیاز به فیلدهای بیشتری باشد
+    # اما sing-box به اندازه کافی هوشمند است که لینک کامل را پارس کند.
+    # برای سادگی، لینک را مستقیماً به عنوان outbound استفاده می‌کنیم.
     
+    # کد بالا کار نمی‌کند. باید پراکسی را به عنوان یک outbound مجزا تعریف کرد.
+    # ساختار صحیح کانفیگ:
+    config = {
+        "outbounds": [
+            {
+                "tag": "proxy-to-test",
+                "type": "auto",  # اجازه می‌دهیم sing-box نوع را از روی لینک تشخیص دهد
+                "server": proxy_link # لینک کامل پراکسی
+            },
+            {
+                "type": "urltest",
+                "tag": "speed-test",
+                "outbounds": ["proxy-to-test"],
+                "url": "http://cp.cloudflare.com/generate_204"
+            }
+        ]
+    }
+
+    with open(TEMP_CONFIG_FILE, 'w') as f:
+        json.dump(config, f)
+
+
+def test_single_proxy(proxy_link: str) -> Optional[int]:
+    """
+    یک پراکسی را با sing-box تست کرده و در صورت موفقیت، پینگ (latency) را برمی‌گرداند.
+    در صورت شکست، None را برمی‌گرداند.
+    """
+    create_singbox_config(proxy_link)
+    
+    command = [
+        SING_BOX_EXECUTABLE,
+        'url-test',
+        '-config', TEMP_CONFIG_FILE
+    ]
+
     try:
-        config = None
-        if protocol in ['vless', 'vmess', 'trojan', 'ss']:
-            config = build_xray_config(proxy_url, local_port)
-        elif protocol in ['hysteria', 'hy2', 'hysteria2']:
-            config = build_hysteria_config(proxy_url, local_port)
+        # اجرای دستور با timeout
+        result = subprocess.run(command, capture_output=True, text=True, timeout=15, check=False)
         
-        if not config: return -1
-        
-        with open(config_path, 'w') as f: json.dump(config, f)
-        
-        command = []
-        if protocol in ['vless', 'vmess', 'trojan', 'ss']:
-            command = [XRAY_CORE_PATH, "run", "-c", config_path]
-        elif protocol in ['hysteria', 'hy2', 'hysteria2']:
-            command = [HYSTERIA_CLIENT_PATH, "-c", config_path] # حالت client پیش‌فرض است
-        
-        process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        time.sleep(2)
+        if result.returncode == 0:
+            output_lines = result.stdout.strip().split('\n')
+            # دنبال خطی می‌گردیم که شامل پینگ است
+            for line in output_lines:
+                if 'ms' in line:
+                    # استخراج عدد پینگ از خط (مثلاً ' proxy-to-test  123 ms')
+                    try:
+                        latency = int(line.split('ms')[0].strip().split()[-1])
+                        return latency
+                    except (ValueError, IndexError):
+                        continue # اگر پارس کردن شکست خورد، خط بعدی را امتحان کن
+        return None
+    except subprocess.TimeoutExpired:
+        return None # پراکسی که تایم‌اوت شود، ناموفق است
+    except Exception:
+        # هر خطای دیگری در اجرای subprocess
+        return None
 
-        # --- تغییر اصلی: تست با سوکت مستقیم ---
-        s = socks.socksocket()
-        s.set_proxy(socks.SOCKS5, "127.0.0.1", local_port)
-        s.settimeout(TIMEOUT_SECONDS)
-        
-        start_time = time.time()
-        s.connect((TEST_HOST, TEST_PORT))
-        latency = int((time.time() - start_time) * 1000)
-        s.close()
-        # ------------------------------------
+def save_results_as_base64(sorted_proxies: List[str]) -> None:
+    """نتایج مرتب‌شده را در فایل‌های خروجی با فرمت Base64 ذخیره می‌کند."""
+    print("\n[INFO] Saving results to output files (Base64 encoded)...")
 
-        return latency if 0 < latency < MAX_LATENCY_MS else -1
-    except Exception as e:
-        # print(f"DEBUG: Test failed for {proxy_url[:30]} with error: {e}") # برای دیباگ
-        return -1
-    finally:
-        if process: process.terminate(); process.wait()
-        if os.path.exists(config_path): os.remove(config_path)
+    # ذخیره تمام پراکسی‌های سالم
+    all_content = "\n".join(sorted_proxies)
+    all_base64 = base64.b64encode(all_content.encode('utf-8')).decode('utf-8')
+    with open(OUTPUT_FILES['all'], 'w') as f:
+        f.write(all_base64)
+    print(f"  -> Saved {len(sorted_proxies)} proxies to '{OUTPUT_FILES['all']}'.")
 
-# ... (بقیه توابع worker, run_tests, combine_and_save_results, main بدون تغییر باقی می‌مانند) ...
-def worker(proxy_queue, results_list):
-    global tested_proxies_count, total_proxies_to_test, progress_lock
-    while not proxy_queue.empty():
-        try:
-            proxy = proxy_queue.get_nowait()
-            latency = test_single_proxy(proxy)
-            if latency > 0:
-                results_list.append({"proxy": proxy, "latency": latency})
-                print(f"  SUCCESS | {latency:4d}ms | {proxy[:55]}...")
-        except Exception: pass
-        finally:
-            with progress_lock:
-                tested_proxies_count += 1
-                if tested_proxies_count % 100 == 0:
-                    percentage = (tested_proxies_count / (total_proxies_to_test or 1)) * 100
-                    print(f"  Progress: {tested_proxies_count}/{total_proxies_to_test} ({percentage:.2f}%) tested.")
-            proxy_queue.task_done()
-def run_tests():
-    print("\n--- Starting All Proxy Tests (Direct Socket Method) ---")
-    try:
-        with open(RAW_PROXIES_FILE, 'r') as f: all_proxies = [line.strip() for line in f if line.strip()]
-        global total_proxies_to_test; total_proxies_to_test = len(all_proxies)
-        if not all_proxies: print("No proxies to test."); return []
-        from queue import Queue
-        proxy_queue = Queue()
-        for p in all_proxies: proxy_queue.put(p)
-        results = []; threads = []; num_threads = 40
-        print(f"Starting test with {num_threads} threads...")
-        for _ in range(num_threads):
-            t = threading.Thread(target=worker, args=(proxy_queue, results)); t.daemon = True; t.start(); threads.append(t)
-        proxy_queue.join()
-        return results
-    except Exception as e:
-        log_error("Test Runner", "An error occurred during testing.", str(e))
-        return []
-def combine_and_save_results(all_results):
-    print(f"\n--- Combining and Saving Results ---\nTotal {len(all_results)} working proxies found.")
-    if not all_results:
-        for path in [OUTPUT_ALL_FILE, OUTPUT_TOP_500_FILE, OUTPUT_TOP_100_FILE]: open(path, 'w').close()
-        print("No working proxies found. Saved empty files."); return
-    sorted_results = sorted(all_results, key=lambda x: x['latency']); sorted_proxies = [item['proxy'] for item in sorted_results]
-    print("Saving final sorted lists...")
-    with open(OUTPUT_ALL_FILE, 'w') as f: f.write('\n'.join(sorted_proxies)); print(f"  -> Saved {len(sorted_proxies)} to '{OUTPUT_ALL_FILE}'")
-    top_500 = sorted_proxies[:500];
-    with open(OUTPUT_TOP_500_FILE, 'w') as f: f.write('\n'.join(top_500)); print(f"  -> Saved {len(top_500)} to '{OUTPUT_TOP_500_FILE}'")
-    top_100 = sorted_proxies[:100];
-    with open(OUTPUT_TOP_100_FILE, 'w') as f: f.write('\n'.join(top_100)); print(f"  -> Saved {len(top_100)} to '{OUTPUT_TOP_100_FILE}'")
+    # ذخیره ۵۰۰ پراکسی برتر
+    top_500 = sorted_proxies[:500]
+    if top_500:
+        top_500_content = "\n".join(top_500)
+        top_500_base64 = base64.b64encode(top_500_content.encode('utf-8')).decode('utf-8')
+        with open(OUTPUT_FILES['top_500'], 'w') as f:
+            f.write(top_500_base64)
+        print(f"  -> Saved {len(top_500)} proxies to '{OUTPUT_FILES['top_500']}'.")
+
+    # ذخیره ۱۰۰ پراکسی برتر
+    top_100 = sorted_proxies[:100]
+    if top_100:
+        top_100_content = "\n".join(top_100)
+        top_100_base64 = base64.b64encode(top_100_content.encode('utf-8')).decode('utf-8')
+        with open(OUTPUT_FILES['top_100'], 'w') as f:
+            f.write(top_100_base64)
+        print(f"  -> Saved {len(top_100)} proxies to '{OUTPUT_FILES['top_100']}'.")
+
 def main():
-    final_results = run_tests()
-    combine_and_save_results(final_results)
-    print("\n--- All tasks finished ---")
+    """تابع اصلی برای اجرای کل فرآیند تست."""
+    print("\n--- Running 02_test_proxies.py ---")
+    
+    if not check_singbox_executable():
+        sys.exit(1)
+
+    try:
+        with open(RAW_PROXIES_FILE, 'r') as f:
+            proxies_to_test = [line.strip() for line in f if line.strip()]
+    except FileNotFoundError:
+        print(f"❌ ERROR: Input file not found: '{RAW_PROXIES_FILE}'.")
+        log_error("Test Proxies", f"Input file '{RAW_PROXIES_FILE}' not found.")
+        return
+
+    total_proxies = len(proxies_to_test)
+    if total_proxies == 0:
+        print("No proxies to test.")
+        return
+
+    print(f"[INFO] Starting test for {total_proxies} proxies...")
+
+    healthy_proxies: List[Tuple[str, int]] = []
+    tested_count = 0
+    healthy_count = 0
+
+    for proxy in proxies_to_test:
+        tested_count += 1
+        latency = test_single_proxy(proxy)
+        
+        if latency is not None:
+            healthy_count += 1
+            healthy_proxies.append((proxy, latency))
+
+        # --- بخش گزارش‌دهی پیشرفت لحظه‌ای ---
+        percentage = (tested_count / total_proxies) * 100
+        progress_line = f"🔄 [PROGRESS] Tested: {tested_count}/{total_proxies} ({percentage:.2f}%) | Healthy: {healthy_count}"
+        sys.stdout.write('\r' + progress_line)
+        sys.stdout.flush()
+
+    # پاک کردن فایل کانفیگ موقت
+    if os.path.exists(TEMP_CONFIG_FILE):
+        os.remove(TEMP_CONFIG_FILE)
+
+    print("\n\n📊 [SUMMARY] Test Complete.")
+    print("-" * 35)
+    print(f"  Total Proxies Scanned: {total_proxies}")
+    print(f"  Total Healthy Proxies: {healthy_count}")
+    if total_proxies > 0:
+        success_rate = (healthy_count / total_proxies) * 100
+        print(f"  Success Rate: {success_rate:.2f}%")
+    print("-" * 35)
+
+    if healthy_proxies:
+        # مرتب‌سازی بر اساس پینگ (کمتر بهتر است)
+        healthy_proxies.sort(key=lambda item: item[1])
+        
+        # استخراج آمار برای لاگ دائمی
+        latencies = [item[1] for item in healthy_proxies]
+        stats = {
+            'passed_count': healthy_count,
+            'avg_latency': sum(latencies) / len(latencies),
+            'min_latency': min(latencies),
+            'max_latency': max(latencies)
+        }
+        
+        # ذخیره نتایج در فایل‌های خروجی
+        sorted_proxy_links = [item[0] for item in healthy_proxies]
+        save_results_as_base64(sorted_proxy_links)
+
+    else:
+        # اگر هیچ پراکسی سالمی پیدا نشد
+        stats = {'passed_count': 0}
+        print("\n[INFO] No healthy proxies found. Output files will be empty.")
+        # ایجاد فایل‌های خالی برای جلوگیری از خطای 404 در لینک‌های اشتراک
+        save_results_as_base64([])
+
+
+    # ثبت خلاصه در لاگ دائمی با استفاده از تابع شما
+    log_test_summary(
+        cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0),
+        raw_count=total_proxies,
+        github_stats=stats,
+        iran_stats={}  # این بخش فعلا خالی است
+    )
+    
+    print("\n--- Finished 02_test_proxies.py ---")
+
+
 if __name__ == "__main__":
     main()
