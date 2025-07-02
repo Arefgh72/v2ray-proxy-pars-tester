@@ -19,50 +19,85 @@ jobs:
       - name: Create base directory if not exists
         run: mkdir -p base
 
-      # --- مرحله آپدیت تستر Xray (x-ray-ping) ---
+      # --- مرحله آپدیت تستر Xray (با پارسر jq اصلاح شده) ---
       - name: Update Xray-Tester (x-ray-ping)
+        id: update_xray
         run: |
           TOOL_NAME="xray-tester"
           REPO="William-An/x-ray-ping"
-          echo "Downloading latest version of $TOOL_NAME from $REPO..."
+          VERSION_FILE="base/$TOOL_NAME.version"
           
-          # --- تغییر اصلی: استفاده مستقیم از لینک latest ---
-          DOWNLOAD_URL="https://github.com/$REPO/releases/latest/download/x-ray-ping_linux_amd64.tar.gz"
+          echo "Checking for $TOOL_NAME updates from $REPO..."
+          # --- استفاده از jq با یک کوئری دقیق‌تر برای پیدا کردن URL دانلود ---
+          API_RESPONSE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest")
+          LATEST_TAG=$(echo "$API_RESPONSE" | jq -r '.tag_name')
+          DOWNLOAD_URL=$(echo "$API_RESPONSE" | jq -r '.assets[] | select(.name | contains("linux_amd64.tar.gz")) | .browser_download_url')
           
-          curl -L -o tool.tar.gz "$DOWNLOAD_URL"
-          tar -xzf tool.tar.gz
-          # فایل اجرایی را به پوشه base منتقل و نام آن را تغییر می‌دهیم
-          mv x-ray-ping "base/$TOOL_NAME"
-          chmod +x "base/$TOOL_NAME"
-          rm tool.tar.gz
-          
-          echo "$TOOL_NAME has been updated/installed."
+          if [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" == "null" ] || [ -z "$DOWNLOAD_URL" ]; then
+            echo "Error: Could not find latest version or download URL from GitHub API."
+            exit 1
+          fi
 
-      # --- مرحله آپدیت کلاینت Hysteria 2 ---
+          echo "Latest version on GitHub is: $LATEST_TAG"
+          CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
+          echo "Current local version is: $CURRENT_VERSION"
+          
+          if [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
+            echo "New version found! Downloading from $DOWNLOAD_URL..."
+            curl -L -o tool.tar.gz "$DOWNLOAD_URL"
+            tar -xzf tool.tar.gz
+            mv x-ray-ping "base/$TOOL_NAME"
+            chmod +x "base/$TOOL_NAME"
+            rm tool.tar.gz
+            
+            echo "$LATEST_TAG" > "$VERSION_FILE"
+            echo "$TOOL_NAME has been updated to $LATEST_TAG"
+            echo "updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "$TOOL_NAME is up to date."
+            echo "updated=false" >> $GITHUB_OUTPUT
+          fi
+
+      # --- مرحله آپدیت کلاینت Hysteria (با روش ریدایرکت) ---
       - name: Update Hysteria-Client
+        id: update_hysteria
         run: |
           TOOL_NAME="hysteria-client"
           REPO="apernet/hysteria"
-          echo "Downloading latest version of $TOOL_NAME from $REPO..."
+          VERSION_FILE="base/$TOOL_NAME.version"
 
-          # --- تغییر اصلی: استفاده مستقیم از لینک latest ---
-          DOWNLOAD_URL="https://github.com/$REPO/releases/latest/download/hysteria-linux-amd64"
+          echo "Checking for $TOOL_NAME updates from $REPO..."
+          LATEST_TAG=$(curl -sI "https://github.com/$REPO/releases/latest" | grep -i "location:" | awk -F'/' '{print $NF}' | tr -d '\r')
+          
+          if [ -z "$LATEST_TAG" ]; then
+            echo "Error: Could not determine latest version for Hysteria."
+            exit 1
+          fi
 
-          curl -L -f -o "base/$TOOL_NAME" "$DOWNLOAD_URL"
-          chmod +x "base/$TOOL_NAME"
+          echo "Latest version on GitHub is: $LATEST_TAG"
+          CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null || echo "none")
+          echo "Current local version is: $CURRENT_VERSION"
 
-          echo "$TOOL_NAME has been updated/installed."
+          if [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
+            echo "New version found! Downloading $LATEST_TAG..."
+            DOWNLOAD_URL="https://github.com/$REPO/releases/download/${LATEST_TAG}/hysteria-linux-amd64"
+            curl -L -f -o "base/$TOOL_NAME" "$DOWNLOAD_URL"
+            chmod +x "base/$TOOL_NAME"
+            
+            echo "$LATEST_TAG" > "$VERSION_FILE"
+            echo "$TOOL_NAME has been updated to $LATEST_TAG"
+            echo "updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "$TOOL_NAME is up to date."
+            echo "updated=false" >> $GITHUB_OUTPUT
+          fi
 
       # --- مرحله کامیت کردن تغییرات ---
       - name: Commit and push updates
+        if: steps.update_xray.outputs.updated == 'true' || steps.update_hysteria.outputs.updated == 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action (Tool Updater)"
-          # چک می‌کند آیا تغییری در پوشه base برای کامیت وجود دارد یا نه
-          if ! git diff --quiet HEAD -- base/; then
-            git add base/
-            git commit -m "chore(base): Update core tools"
-            git push
-          else
-            echo "No tool updates to commit."
-          fi
+          git add base/
+          git commit -m "chore(base): Update core tools automatically"
+          git push
