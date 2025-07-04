@@ -24,3 +24,4 @@ https://raw.githubusercontent.com/barry-far/V2ray-config/main/Splitted-By-Protoc
 https://raw.githubusercontent.com/barry-far/V2ray-config/main/Sub1.txt
 https://raw.githubusercontent.com/barry-far/V2ray-config/main/Sub2.txt
 https://raw.githubusercontent.com/barry-far/V2ray-config/main/Sub3.txt
+https://raw.githubusercontent.com/barry-far/V2ray-config/main/Splitted-By-Protocol/ss.txt
