@@ -41,15 +41,24 @@ def log_error(stage: str, message: str, error_details: str = ""):
         print(f"CRITICAL: Failed to write to error log file: {e}")
 
 
-def log_test_summary(cycle_number: int, raw_count: int, github_stats: dict, iran_stats: dict):
+def log_test_summary(
+    cycle_number: int, 
+    raw_count: int, 
+    github_stats: dict, 
+    iran_stats: dict, 
+    input_stats_by_type: dict = None, 
+    qualified_stats_by_type: dict = None
+):
     """
     خلاصه نتایج تست هر دوره را در فایل لاگ تست ثبت می‌کند (حالت append).
 
     Args:
-        cycle_number (int): شماره اجرای ورک‌فلو (برای پیگیری).
-        raw_count (int): تعداد کل پروکسی‌های خام استخراج شده.
+        cycle_number (int): شماره اجرای ورک‌فلو.
+        raw_count (int): تعداد کل پروکسی‌های خام.
         github_stats (dict): دیکشنری شامل آمار تست گیت‌هاب.
         iran_stats (dict): دیکشنری شامل آمار تست ایران.
+        input_stats_by_type (dict, optional): تعداد پروکسی‌های ورودی به تفکیک نوع.
+        qualified_stats_by_type (dict, optional): تعداد پروکسی‌های سالم به تفکیک نوع.
     """
     _ensure_log_directory_exists()
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -60,7 +69,7 @@ def log_test_summary(cycle_number: int, raw_count: int, github_stats: dict, iran
     # --- بخش آمار تست گیت‌هاب ---
     log_entry += "[ GitHub Test Summary ]\n"
     if github_stats.get('passed_count', 0) > 0:
-        log_entry += f"  - Proxies Passed: {github_stats.get('passed_count', 0)}\n"
+        log_entry += f"  - Proxies Passed (Qualified): {github_stats.get('passed_count', 0)}\n"
         log_entry += f"  - Average Latency: {github_stats.get('avg_latency', 0.0):.2f} ms\n"
         log_entry += f"  - Min Latency: {github_stats.get('min_latency', 0)} ms\n"
         log_entry += f"  - Max Latency: {github_stats.get('max_latency', 0)} ms\n"
@@ -68,18 +77,23 @@ def log_test_summary(cycle_number: int, raw_count: int, github_stats: dict, iran
         log_entry += "  - No proxies passed the GitHub test.\n"
     log_entry += "\n"
 
-    # --- بخش آمار تست ایران ---
-    # این بخش در فاز دوم پروژه تکمیل خواهد شد.
-    log_entry += "[ Iran Test Summary ]\n"
-    if iran_stats.get('passed_count', 0) > 0:
-        log_entry += f"  - Proxies Passed: {iran_stats.get('passed_count', 0)}\n"
-        log_entry += f"  - Average Latency: {iran_stats.get('avg_latency', 0.0):.2f} ms\n"
-        log_entry += f"  - Min Latency: {iran_stats.get('min_latency', 0)} ms\n"
-        log_entry += f"  - Max Latency: {iran_stats.get('max_latency', 0)} ms\n"
-        log_entry += f"  - Average Download Speed: {iran_stats.get('avg_speed', 0.0):.2f} Mbps\n"
+    # --- <<< تغییر اصلی: اضافه کردن بخش آمار تفکیکی >>> ---
+    log_entry += "[ Breakdown by Protocol ]\n"
+    if input_stats_by_type:
+        all_schemes = sorted(input_stats_by_type.keys())
+        for scheme in all_schemes:
+            input_count = input_stats_by_type.get(scheme, 0)
+            passed_count = qualified_stats_by_type.get(scheme, 0) if qualified_stats_by_type else 0
+            success_rate = (passed_count / input_count * 100) if input_count > 0 else 0
+            # فرمت‌بندی برای خوانایی بهتر در لاگ
+            log_entry += f"  - {scheme.upper():<8} | Input: {input_count:<5} -> Qualified: {passed_count:<5} ({success_rate:.1f}%)\n"
     else:
-        # متنی که نشان می‌دهد این بخش هنوز اجرا نشده یا ناموفق بوده است
-        log_entry += "  - Iran test was not run or no proxies passed.\n"
+        log_entry += "  - No protocol breakdown available.\n"
+    log_entry += "\n"
+
+    # --- بخش آمار تست ایران ---
+    log_entry += "[ Iran Test Summary ]\n"
+    log_entry += "  - Iran test was not run or no proxies passed.\n"
     
     log_entry += "====================================================================\n\n"
 
@@ -88,5 +102,4 @@ def log_test_summary(cycle_number: int, raw_count: int, github_stats: dict, iran
             f.write(log_entry)
         print("TEST SUMMARY LOGGED.")
     except Exception as e:
-        # اگر در نوشتن لاگ اصلی هم خطا رخ داد، آن را در لاگ خطا ثبت می‌کنیم
         log_error("Logging", "Failed to write to test summary log file.", str(e))
