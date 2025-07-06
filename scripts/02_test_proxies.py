@@ -6,6 +6,8 @@ import base64
 import time
 from typing import List, Tuple, Optional, Dict
 from urllib.parse import urlparse, parse_qs
+# <<< تغییر ۱: اضافه کردن Counter >>>
+from collections import Counter
 
 from .utils import log_error, log_test_summary
 
@@ -49,9 +51,7 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
             outbound_config['uuid'] = parsed.username
         elif protocol == 'trojan': 
             outbound_config['password'] = parsed.username
-        # <<< تغییر اصلی: اضافه کردن منطق برای هیستریا >>>
         elif protocol in ['hysteria', 'hysteria2']:
-            # کلید احراز هویت هیستریا در بخش username لینک قرار دارد
             outbound_config['auth'] = parsed.username
         elif protocol == 'shadowsocks':
             try:
@@ -152,6 +152,11 @@ async def main_async():
 
     total_proxies = len(proxies_to_test)
     if total_proxies == 0: print("No proxies to test."); return
+    
+    # <<< تغییر ۲: شمارش پراکسی‌های ورودی بر اساس نوع >>>
+    # با استفاده از `urlparse` نوع پروتکل (scheme) هر لینک را استخراج می‌کنیم
+    input_counts = Counter(urlparse(p).scheme for p in proxies_to_test if urlparse(p).scheme)
+
     print(f"[INFO] Starting parallel test for {total_proxies} proxies with {CONCURRENT_TESTS} workers...")
 
     healthy_proxies: List[Tuple[str, int]] = []
@@ -200,17 +205,30 @@ async def main_async():
     print("-" * 35)
 
     stats = {'passed_count': 0}
+    qualified_counts = None # مقدار اولیه
     if qualified_proxies:
         qualified_proxies.sort(key=lambda item: item[1])
         latencies = [item[1] for item in qualified_proxies]
         stats = {'passed_count': len(qualified_proxies), 'avg_latency': sum(latencies) / len(qualified_proxies), 'min_latency': min(latencies), 'max_latency': max(latencies)}
         sorted_proxy_links = [item[0] for item in qualified_proxies]
+        
+        # <<< تغییر ۳: شمارش پراکسی‌های سالم بر اساس نوع >>>
+        qualified_counts = Counter(urlparse(p[0]).scheme for p in qualified_proxies if urlparse(p[0]).scheme)
+        
         save_results_as_base64(sorted_proxy_links)
     else:
         print("\n[INFO] No qualified proxies found. Output files will be empty.")
         save_results_as_base64([])
-        
-    log_test_summary(cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0), raw_count=total_proxies, github_stats=stats, iran_stats={})
+    
+    # <<< تغییر ۴: ارسال آمار جدید به تابع لاگ >>>
+    log_test_summary(
+        cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0), 
+        raw_count=total_proxies, 
+        github_stats=stats, 
+        iran_stats={},
+        input_stats_by_type=dict(input_counts),
+        qualified_stats_by_type=dict(qualified_counts) if qualified_counts else {}
+    )
     print("\n--- Finished 02_test_proxies.py ---")
 
 
