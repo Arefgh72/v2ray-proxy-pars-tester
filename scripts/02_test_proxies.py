@@ -25,7 +25,6 @@ DEBUG_MODE = False
 
 # --- تنظیمات کلیدی ---
 CONCURRENT_TESTS = 250
-# --- <<< شرط جدید: حداکثر پینگ مجاز >>> ---
 MAX_LATENCY_MS = 2000
 
 def check_singbox_executable() -> bool:
@@ -37,7 +36,6 @@ def check_singbox_executable() -> bool:
     return True
 
 def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
-    # این تابع کامل و صحیح است و بدون تغییر باقی می‌ماند
     try:
         if proxy_link.startswith('vmess://'): return None
         parsed = urlparse(proxy_link)
@@ -46,14 +44,22 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
         if not protocol: return None
         params = parse_qs(parsed.query)
         outbound_config = {"type": protocol, "tag": "proxy-out", "server": parsed.hostname, "server_port": parsed.port}
-        if protocol == 'vless': outbound_config['uuid'] = parsed.username
-        elif protocol == 'trojan': outbound_config['password'] = parsed.username
+        
+        if protocol == 'vless': 
+            outbound_config['uuid'] = parsed.username
+        elif protocol == 'trojan': 
+            outbound_config['password'] = parsed.username
+        # <<< تغییر اصلی: اضافه کردن منطق برای هیستریا >>>
+        elif protocol in ['hysteria', 'hysteria2']:
+            # کلید احراز هویت هیستریا در بخش username لینک قرار دارد
+            outbound_config['auth'] = parsed.username
         elif protocol == 'shadowsocks':
             try:
                 decoded_user = base64.urlsafe_b64decode(parsed.username + '===').decode('utf-8')
                 method, password = decoded_user.split(':', 1)
                 outbound_config['method'] = method; outbound_config['password'] = password
             except: return None
+            
         VALID_TRANSPORT_TYPES = {'ws', 'grpc', 'quic'}
         transport_type = params.get('type', [None])[0]
         if transport_type and transport_type != 'tcp':
@@ -62,17 +68,18 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
             if 'host' in params: transport_config['headers'] = {'Host': params['host'][0]}
             if 'path' in params: transport_config['path'] = params['path'][0]
             outbound_config['transport'] = transport_config
+            
         if 'security' in params and params['security'][0] == 'tls':
             tls_config = {"enabled": True}
             if 'sni' in params: tls_config['server_name'] = params['sni'][0]
             if 'allowInsecure' in params and params['allowInsecure'][0] == '1': tls_config['insecure'] = True
             if 'transport' in outbound_config: outbound_config['transport']['tls'] = tls_config
             else: outbound_config['tls'] = tls_config
+            
         return outbound_config
     except Exception: return None
 
 def create_singbox_config(outbound_config: Dict, port: int, temp_file_path: str) -> None:
-    # این تابع صحیح است و بدون تغییر باقی می‌ماند
     config = {
         "inbounds": [{"type": "socks", "listen": "127.0.0.1", "listen_port": port, "tag": "socks-in"}],
         "outbounds": [outbound_config],
@@ -82,7 +89,6 @@ def create_singbox_config(outbound_config: Dict, port: int, temp_file_path: str)
         json.dump(config, f)
 
 async def test_single_proxy_async(proxy_index: int, proxy_link: str) -> Optional[Tuple[str, int]]:
-    # این تابع صحیح است و بدون تغییر باقی می‌ماند
     outbound_config = parse_proxy_link(proxy_link)
     if not outbound_config: return None
     port = LOCAL_SOCKS_PORT_START + proxy_index
@@ -111,7 +117,6 @@ async def test_single_proxy_async(proxy_index: int, proxy_link: str) -> Optional
             await singbox_process.wait()
 
 def save_results_as_base64(sorted_proxies: List[str]) -> None:
-    # این تابع صحیح است و بدون تغییر باقی می‌ماند
     print("\n[INFO] Saving results to output files (Base64 encoded)...")
     all_content = "\n".join(sorted_proxies)
     all_base64 = base64.b64encode(all_content.encode('utf-8')).decode('utf-8')
@@ -153,7 +158,6 @@ async def main_async():
     
     semaphore = asyncio.Semaphore(CONCURRENT_TESTS)
     tested_count = 0
-    # --- <<< تغییر ۱: اضافه کردن شمارنده پراکسی‌های با کیفیت >>> ---
     qualified_count = 0
     
     async def worker(proxy_index, proxy_link):
@@ -162,14 +166,12 @@ async def main_async():
             result = await test_single_proxy_async(proxy_index, proxy_link)
             if result:
                 healthy_proxies.append(result)
-                # اگر پینگ زیر حد مجاز بود، شمارنده کیفیت را اضافه کن
                 if result[1] < MAX_LATENCY_MS:
                     qualified_count += 1
 
             tested_count += 1
             if tested_count % PROGRESS_UPDATE_INTERVAL == 0 or tested_count == total_proxies:
                 percentage = (tested_count / total_proxies) * 100
-                # --- <<< تغییر ۲: نمایش شمارنده جدید در پروگرس بار >>> ---
                 progress_line = f"🔄 [PROGRESS] Tested: {tested_count}/{total_proxies} ({percentage:.2f}%) | Healthy: {len(healthy_proxies)} | Qualified (<{MAX_LATENCY_MS}ms): {qualified_count}"
                 sys.stdout.write('\r' + progress_line)
                 sys.stdout.flush()
@@ -177,7 +179,6 @@ async def main_async():
     tasks = [worker(i, proxy) for i, proxy in enumerate(proxies_to_test)]
     await asyncio.gather(*tasks)
 
-    # پاکسازی فایل‌های موقت
     for item in os.listdir(TEMP_DIR):
         try: os.remove(os.path.join(TEMP_DIR, item))
         except: pass
@@ -189,7 +190,6 @@ async def main_async():
     print(f"  Total Proxies Scanned: {total_proxies}")
     print(f"  Total Healthy Proxies: {len(healthy_proxies)}")
 
-    # --- <<< تغییر ۳: فیلتر کردن پراکسی‌ها قبل از ذخیره‌سازی >>> ---
     print(f"\n[INFO] Filtering healthy proxies with latency < {MAX_LATENCY_MS}ms...")
     qualified_proxies = [p for p in healthy_proxies if p[1] < MAX_LATENCY_MS]
     print(f"  -> Found {len(qualified_proxies)} qualified proxies.")
