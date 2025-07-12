@@ -32,3 +32,5 @@ https://raw.githubusercontent.com/liketolivefree/kobabi/main/sub_all.txt
 http://yalda.nscl.ir
 https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/main/Vless
 https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/main/T,H
+https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/splitted/ss.txt
+https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/sub_merge.txt
