@@ -43,9 +43,6 @@ These proxies are tested from GitHub's international servers. They are generally
 
 ---
 
-### 🇮🇷 Iran-Tested Proxies (Optimized for Iran) - COMING SOON (It is inactive)
-
-These proxies will be tested from a server inside Iran for real-world performance. **These will be the recommended links for users in Iran once available.**
 
 ---
 
