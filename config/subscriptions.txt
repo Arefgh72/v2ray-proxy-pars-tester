@@ -38,3 +38,11 @@ https://raw.githubusercontent.com/mahdibland/SSAggregator/master/sub/sub_merge_b
 https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Vless.txt
 https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Hysteria2.txt
 https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vless_iran.txt
+https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/de/mixed
+https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/nl/mixed
+https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/nz/mixed
+https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/layers/ipv4
+https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/channels/security/non-tls
+https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/splitted/mixed
+https://raw.githubusercontent.com/10ium/HiN-VPN/main/subscription/base64/hysteria2
+https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/subscribe/protocols/vless
