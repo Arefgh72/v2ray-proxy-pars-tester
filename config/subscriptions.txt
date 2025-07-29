@@ -47,3 +47,5 @@ https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/splitted
 https://raw.githubusercontent.com/10ium/HiN-VPN/main/subscription/base64/hysteria2
 https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/subscribe/protocols/vless
 https://raw.githubusercontent.com/10ium/base64-encoder/main/encoded/10ium_proxy_configs.txt
+https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/hysteria2.txt
+https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/vless.txt
