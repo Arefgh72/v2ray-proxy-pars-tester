@@ -1,6 +1,5 @@
 https://raw.githubusercontent.com/mshojaei77/v2rayAuto/main/subs/hysteria
 https://raw.githubusercontent.com/mshojaei77/v2rayAuto/main/subs/hy2
-https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/subscribe/protocols/hysteria
 https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/main/T,H
 https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Hysteria2.txt
 https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/layers/ipv4
