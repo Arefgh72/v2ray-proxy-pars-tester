@@ -1,0 +1,73 @@
+# نام ورک‌فلو
+name: Fetch and Test Proxies CI
+
+# --- تریگرها ---
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */3 * * *'
+
+# --- <<< تغییر اصلی و نهایی: اضافه کردن مجوزها >>> ---
+# این بخش به ورک‌فلو اجازه می‌دهد تا در مخزن شما کد پوش کند.
+permissions:
+  contents: write
+
+# --- تعریف کارها ---
+jobs:
+  update-proxies:
+    runs-on: ubuntu-latest
+    steps:
+      # مرحله ۱: دریافت کد
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # مرحله ۲: نصب Sing-box
+      - name: Install and Setup Sing-box
+        run: |
+          echo "Fetching latest Sing-box version..."
+          LATEST_TAG=$(curl -s "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          if [ -z "$LATEST_TAG" ]; then
+              echo "Failed to fetch latest tag. Exiting."
+              exit 1
+          fi
+          DOWNLOAD_URL="https://github.com/SagerNet/sing-box/releases/download/${LATEST_TAG}/sing-box-${LATEST_TAG#v}-linux-amd64.tar.gz"
+          echo "Downloading from: $DOWNLOAD_URL"
+          curl -L -o sing-box.tar.gz "$DOWNLOAD_URL"
+          tar -xzf sing-box.tar.gz
+          mv sing-box-*/sing-box .
+          chmod +x ./sing-box
+          echo "Sing-box setup complete."
+
+      # مرحله ۳: راه‌اندازی پایتون
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # مرحله ۴: نصب وابستگی‌ها
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # مرحله ۵: اجرای اسکریپت‌ها
+      - name: Run Fetch Proxies
+        run: python -m scripts.01_fetch_proxies
+
+      - name: Run Test Proxies
+        run: python -m scripts.02_test_proxies
+
+      # مرحله ۶: کامیت و پوش کردن نتایج
+      - name: Commit and Push Results
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add output/
+          COMMIT_MESSAGE="✅ Auto-Update: Proxy lists refreshed at $(date -u)"
+          # اگر تغییری وجود داشته باشد، کامیت کن
+          if ! git diff --staged --quiet; then
+            git commit -m "$COMMIT_MESSAGE"
+            git push
+          else
+            echo "No changes to commit."
+          fi
