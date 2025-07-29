@@ -63,6 +63,7 @@ jobs:
           python -m scripts.01_fetch_proxies
           
           echo "--- Running Testers ---"
+          python -m scripts.02_test_hysteria
           python -m scripts.02_test_proxies
 
           echo "--- Running Merger ---"
