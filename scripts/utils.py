@@ -10,6 +10,7 @@ def get_proxies_from_file(path: Path) -> list[str]:
     if not path.exists():
         return []
     with open(path, 'r', encoding='utf-8') as f:
+        # فقط خطوطی را که پس از حذف فاصله‌های اضافی، خالی نیستند، برمی‌گرداند
         return [line.strip() for line in f if line.strip()]
 
 def save_proxies_to_file(proxies: list[str], path: Path):
@@ -22,7 +23,7 @@ def save_proxies_to_file(proxies: list[str], path: Path):
 
 def save_json_to_file(data: list[dict], path: Path):
     """
-    داده‌های ساختار یافته را در یک فایل JSON ذخیره می‌کند.
+    داده‌های ساختار یافته (لیستی از دیکشنری‌ها) را در یک فایل JSON ذخیره می‌کند.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, 'w', encoding='utf-8') as f:
@@ -30,12 +31,10 @@ def save_json_to_file(data: list[dict], path: Path):
 
 def save_summary_log(path: Path, **kwargs):
     """
-    ✅ تابع جدید: یک لاگ خلاصه کامل و تفکیک‌شده ایجاد می‌کند.
+    یک لاگ خلاصه کامل و تفکیک‌شده ایجاد می‌کند.
     آمار هر بخش را به صورت جداگانه دریافت و در فایل نهایی می‌نویسد.
     """
     summary_parts = []
-    # kwargs یک دیکشنری از آمارهاست، مثلا:
-    # hysteria_stats={'fetched': 100, 'working': 80}
     
     if 'hysteria_stats' in kwargs:
         stats = kwargs['hysteria_stats']
