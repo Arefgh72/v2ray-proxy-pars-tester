@@ -1,105 +1,68 @@
-import datetime
-import os
+# scripts/utils.py
 
-# --- تنظیمات ---
-LOG_DIR = 'output'  # نام پوشه‌ای که تمام لاگ‌ها و خروجی‌ها در آن ذخیره می‌شوند
-ERROR_LOG_FILE = os.path.join(LOG_DIR, "error.log")
-TEST_SUMMARY_LOG_FILE = os.path.join(LOG_DIR, "test_summary.log")
+import json
+from pathlib import Path
 
-
-def _ensure_log_directory_exists():
+def get_proxies_from_file(path: Path) -> list[str]:
     """
-    اطمینان حاصل می‌کند که پوشه لاگ (output) وجود دارد.
-    اگر وجود نداشته باشد، آن را ایجاد می‌کند. این کار از خطای FileNotFoundError جلوگیری می‌کند.
+    پراکسی‌ها را از یک فایل متنی می‌خواند و خطوط خالی را نادیده می‌گیرد.
     """
-    os.makedirs(LOG_DIR, exist_ok=True)
+    if not path.exists():
+        return []
+    with open(path, 'r', encoding='utf-8') as f:
+        return [line.strip() for line in f if line.strip()]
 
-
-def log_error(stage: str, message: str, error_details: str = ""):
+def save_proxies_to_file(proxies: list[str], path: Path):
     """
-    یک خطای مشخص را در فایل لاگ خطا ثبت می‌کند. حالت فایل 'a' (append) است تا لاگ‌های قبلی حفظ شوند.
-
-    Args:
-        stage (str): مرحله‌ای از فرآیند که خطا در آن رخ داده (مثلاً "Fetch Proxies", "GitHub Test").
-        message (str): پیام اصلی و خوانا برای خطا.
-        error_details (str, optional): جزئیات فنی بیشتر درباره خطا.
+    لیستی از پراکسی‌ها را در یک فایل متنی ذخیره می‌کند، هر کدام در یک خط.
     """
-    _ensure_log_directory_exists()
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(proxies))
+
+def save_json_to_file(data: list[dict], path: Path):
+    """
+    داده‌های ساختار یافته را در یک فایل JSON ذخیره می‌کند.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+def save_summary_log(path: Path, **kwargs):
+    """
+    ✅ تابع جدید: یک لاگ خلاصه کامل و تفکیک‌شده ایجاد می‌کند.
+    آمار هر بخش را به صورت جداگانه دریافت و در فایل نهایی می‌نویسد.
+    """
+    summary_parts = []
+    # kwargs یک دیکشنری از آمارهاست، مثلا:
+    # hysteria_stats={'fetched': 100, 'working': 80}
     
-    log_entry = f"[{timestamp}] [Stage: {stage}] [Error: {message}]\n"
-    if error_details:
-        log_entry += f"  Details: {error_details}\n"
-    log_entry += "-" * 60 + "\n"  # جداکننده برای خوانایی بهتر
-
-    try:
-        with open(ERROR_LOG_FILE, 'a', encoding='utf-8') as f:
-            f.write(log_entry)
-        # همچنین خطا را در کنسول چاپ می‌کنیم تا در لاگ‌های گیت‌هاب اکشن هم دیده شود
-        print(f"ERROR LOGGED: {stage} - {message}")
-    except Exception as e:
-        print(f"CRITICAL: Failed to write to error log file: {e}")
-
-
-def log_test_summary(
-    cycle_number: int, 
-    raw_count: int, 
-    github_stats: dict, 
-    iran_stats: dict, 
-    input_stats_by_type: dict = None, 
-    qualified_stats_by_type: dict = None
-):
-    """
-    خلاصه نتایج تست هر دوره را در فایل لاگ تست ثبت می‌کند (حالت append).
-
-    Args:
-        cycle_number (int): شماره اجرای ورک‌فلو.
-        raw_count (int): تعداد کل پروکسی‌های خام.
-        github_stats (dict): دیکشنری شامل آمار تست گیت‌هاب.
-        iran_stats (dict): دیکشنری شامل آمار تست ایران.
-        input_stats_by_type (dict, optional): تعداد پروکسی‌های ورودی به تفکیک نوع.
-        qualified_stats_by_type (dict, optional): تعداد پروکسی‌های سالم به تفکیک نوع.
-    """
-    _ensure_log_directory_exists()
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if 'hysteria_stats' in kwargs:
+        stats = kwargs['hysteria_stats']
+        summary_parts.append(
+            f"--- Hysteria Test Summary ---\n"
+            f"Total Fetched: {stats.get('fetched', 0)}\n"
+            f"Working: {stats.get('working', 0)}\n"
+        )
+        
+    if 'v2ray_stats' in kwargs:
+        stats = kwargs['v2ray_stats']
+        summary_parts.append(
+            f"--- V2Ray/Main Test Summary ---\n"
+            f"Total Fetched: {stats.get('fetched', 0)}\n"
+            f"Working: {stats.get('working', 0)}\n"
+        )
+        
+    if 'final_stats' in kwargs:
+        stats = kwargs['final_stats']
+        summary_parts.append(
+            f"--- Final Merged Summary ---\n"
+            f"Total Unique Working Proxies: {stats.get('total_unique', 0)}\n"
+        )
+        
+    summary_content = "\n".join(summary_parts)
     
-    log_entry = f"================== Cycle #{cycle_number} | {timestamp} ==================\n"
-    log_entry += f"Total Raw Proxies Fetched: {raw_count}\n\n"
-
-    # --- بخش آمار تست گیت‌هاب ---
-    log_entry += "[ GitHub Test Summary ]\n"
-    if github_stats.get('passed_count', 0) > 0:
-        log_entry += f"  - Proxies Passed (Qualified): {github_stats.get('passed_count', 0)}\n"
-        log_entry += f"  - Average Latency: {github_stats.get('avg_latency', 0.0):.2f} ms\n"
-        log_entry += f"  - Min Latency: {github_stats.get('min_latency', 0)} ms\n"
-        log_entry += f"  - Max Latency: {github_stats.get('max_latency', 0)} ms\n"
-    else:
-        log_entry += "  - No proxies passed the GitHub test.\n"
-    log_entry += "\n"
-
-    # --- <<< تغییر اصلی: اضافه کردن بخش آمار تفکیکی >>> ---
-    log_entry += "[ Breakdown by Protocol ]\n"
-    if input_stats_by_type:
-        all_schemes = sorted(input_stats_by_type.keys())
-        for scheme in all_schemes:
-            input_count = input_stats_by_type.get(scheme, 0)
-            passed_count = qualified_stats_by_type.get(scheme, 0) if qualified_stats_by_type else 0
-            success_rate = (passed_count / input_count * 100) if input_count > 0 else 0
-            # فرمت‌بندی برای خوانایی بهتر در لاگ
-            log_entry += f"  - {scheme.upper():<8} | Input: {input_count:<5} -> Qualified: {passed_count:<5} ({success_rate:.1f}%)\n"
-    else:
-        log_entry += "  - No protocol breakdown available.\n"
-    log_entry += "\n"
-
-    # --- بخش آمار تست ایران ---
-    log_entry += "[ Iran Test Summary ]\n"
-    log_entry += "  - Iran test was not run or no proxies passed.\n"
-    
-    log_entry += "====================================================================\n\n"
-
-    try:
-        with open(TEST_SUMMARY_LOG_FILE, 'a', encoding='utf-8') as f:
-            f.write(log_entry)
-        print("TEST SUMMARY LOGGED.")
-    except Exception as e:
-        log_error("Logging", "Failed to write to test summary log file.", str(e))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(summary_content, encoding='utf-8')
+    print("\n" + summary_content)
+    print(f"✅ خلاصه کامل در فایل {path} ذخیره شد.")
