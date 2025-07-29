@@ -10,59 +10,43 @@ import string
 import time
 import os
 
-# توابع کمکی را از فایل utils وارد می‌کنیم
 from .utils import get_proxies_from_file, save_proxies_to_file, save_json_to_file
 
-# مسیر فایل اجرایی کلاینت Hysteria
 HYSTERIA_CLIENT_PATH = "./hysteria-client"
 
 def generate_random_filename(prefix="temp_hy_config_", extension=".json"):
-    """یک نام فایل تصادفی برای جلوگیری از تداخل در اجرای موازی ایجاد می‌کند."""
     random_str = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
     return f"{prefix}{random_str}{extension}"
 
 def test_hysteria_proxy(proxy: str) -> dict:
     """
-    ✅ آپدیت شده: پراکسی Hysteria را با اجرای کامل کلاینت و تست اتصال با curl می‌سنجد.
+    ✅ بازنویسی شده با مدیریت فرآیند قوی‌تر برای جلوگیری از هنگ کردن.
     """
     temp_config_filename = generate_random_filename()
     config_path = Path(temp_config_filename)
-    
-    # تعریف یک پورت محلی رندوم برای پراکسی SOCKS5
     local_port = random.randint(20001, 30000)
 
-    # ساختار کانفیگ کامل برای اجرای کلاینت Hysteria
-    # یک ورودی SOCKS5 محلی ایجاد می‌کند که تمام ترافیک را به سرور پراکسی اصلی می‌فرستد
     config = {
         "server": proxy,
         "insecure": True,
-        "inbound": {
-            "type": "socks5",
-            "listen": f"127.0.0.1:{local_port}"
-        }
+        "inbound": {"type": "socks5", "listen": f"127.0.0.1:{local_port}"}
     }
     
+    # ✅ متغیر فرآیند را قبل از بلوک try تعریف می‌کنیم
     process = None
     try:
         config_path.write_text(json.dumps(config), encoding='utf-8')
         
-        # اجرای کلاینت Hysteria در پس‌زمینه
         command = [HYSTERIA_CLIENT_PATH, "client", "-c", str(config_path)]
-        process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # ✅ استفاده از preexec_fn=os.setsid برای اطمینان از اینکه می‌توانیم کل گروه فرآیند را ببندیم
+        process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, preexec_fn=os.setsid)
         
-        # یک لحظه کوتاه برای اطمینان از اجرای کامل کلاینت
         time.sleep(2)
 
-        # تست اتصال از طریق پراکسی محلی SOCKS5 با curl
         curl_command = [
-            "curl",
-            "-s",
-            # ✅ استفاده از پراکسی socks5
-            "--socks5-hostname", f"127.0.0.1:{local_port}",
-            "http://cp.cloudflare.com/",
-            "--connect-timeout", "5",
-            "-o", "/dev/null",
-            "-w", "%{time_connect}"
+            "curl", "-s", "--socks5-hostname", f"127.0.0.1:{local_port}",
+            "http://cp.cloudflare.com/", "--connect-timeout", "5",
+            "-o", "/dev/null", "-w", "%{time_connect}"
         ]
         
         curl_proc = subprocess.run(curl_command, capture_output=True, text=True, timeout=10)
@@ -80,18 +64,18 @@ def test_hysteria_proxy(proxy: str) -> dict:
     except Exception:
         return {"proxy": proxy, "status": "dead", "delay": -1}
     finally:
-        # اطمینان از بسته شدن فرآیند کلاینت در هر حالتی
-        if process:
-            process.kill()
+        # ✅ بلوک finally قوی‌تر برای اطمینان از بسته شدن فرآیند
+        if process and process.poll() is None:
+            try:
+                # بستن کل گروه فرآیند
+                os.killpg(os.getpgid(process.pid), subprocess.signal.SIGTERM)
+            except ProcessLookupError:
+                pass # فرآیند قبلاً بسته شده است
         if config_path.exists():
             config_path.unlink()
 
 def main():
-    """
-    تابع اصلی برای اجرای موازی تست‌ها، مرتب‌سازی و ذخیره نتایج.
-    """
     print("🚀 شروع تست پراکسی‌های Hysteria با روش 'run'...")
-    
     proxies_file_path = Path("output/fetched_hysteria.txt")
     proxies_to_test = get_proxies_from_file(proxies_file_path)
 
@@ -102,8 +86,6 @@ def main():
         return
 
     working_proxies_results = []
-    
-    # کاهش تعداد workerها به دلیل سنگین‌تر بودن این روش تست
     with ThreadPoolExecutor(max_workers=50) as executor:
         results = executor.map(test_hysteria_proxy, proxies_to_test)
     
@@ -112,7 +94,6 @@ def main():
             working_proxies_results.append(result)
             
     working_proxies_results.sort(key=lambda p: p["delay"])
-    
     final_proxy_strings = [p["proxy"] for p in working_proxies_results]
     
     json_output_path = Path("output/hysteria_results.json")
