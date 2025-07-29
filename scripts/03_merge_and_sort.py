@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 # توابع کمکی را از فایل utils وارد می‌کنیم
-from .utils import save_proxies_to_file, save_summary_log
+from utils import save_proxies_to_file, save_summary_log
 
 def load_results_from_json(path: Path) -> list:
     """
