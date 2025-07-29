@@ -4,7 +4,7 @@ from pathlib import Path
 from base64 import b64decode
 from curl_cffi.requests import get
 # ✅ اصلاح شده: فقط توابع موجود را وارد می‌کنیم
-from .utils import get_proxies_from_file, save_proxies_to_file
+from utils import get_proxies_from_file, save_proxies_to_file
 
 def get_and_decode_proxies(url: str) -> list[str]:
     """
