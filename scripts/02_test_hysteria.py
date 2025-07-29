@@ -20,7 +20,7 @@ def generate_random_filename(prefix="temp_hy_config_", extension=".json"):
 
 def test_hysteria_proxy(proxy: str) -> dict:
     """
-    ✅ بازنویسی شده با مدیریت فرآیند قوی‌تر برای جلوگیری از هنگ کردن.
+    پراکسی Hysteria را با اجرای کامل کلاینت و تست اتصال با curl می‌سنجد.
     """
     temp_config_filename = generate_random_filename()
     config_path = Path(temp_config_filename)
@@ -32,13 +32,11 @@ def test_hysteria_proxy(proxy: str) -> dict:
         "inbound": {"type": "socks5", "listen": f"127.0.0.1:{local_port}"}
     }
     
-    # ✅ متغیر فرآیند را قبل از بلوک try تعریف می‌کنیم
     process = None
     try:
         config_path.write_text(json.dumps(config), encoding='utf-8')
         
         command = [HYSTERIA_CLIENT_PATH, "client", "-c", str(config_path)]
-        # ✅ استفاده از preexec_fn=os.setsid برای اطمینان از اینکه می‌توانیم کل گروه فرآیند را ببندیم
         process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, preexec_fn=os.setsid)
         
         time.sleep(2)
@@ -64,13 +62,11 @@ def test_hysteria_proxy(proxy: str) -> dict:
     except Exception:
         return {"proxy": proxy, "status": "dead", "delay": -1}
     finally:
-        # ✅ بلوک finally قوی‌تر برای اطمینان از بسته شدن فرآیند
         if process and process.poll() is None:
             try:
-                # بستن کل گروه فرآیند
                 os.killpg(os.getpgid(process.pid), subprocess.signal.SIGTERM)
             except ProcessLookupError:
-                pass # فرآیند قبلاً بسته شده است
+                pass
         if config_path.exists():
             config_path.unlink()
 
