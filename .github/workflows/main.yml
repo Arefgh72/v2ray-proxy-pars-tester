@@ -1,70 +1,86 @@
 # نام ورک‌فلو
-name: Fetch and Test Proxies CI
+name: Fetch, Test and Merge Proxies CI
 
-# --- تریگرها ---
+# --- تریگرها (زمان‌بندی و دستی) ---
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '0 */3 * * *' # هر سه ساعت یک‌بار اجرا می‌شود
 
-# --- <<< تغییر اصلی و نهایی: اضافه کردن مجوزها >>> ---
-# این بخش به ورک‌فلو اجازه می‌دهد تا در مخزن شما کد پوش کند.
+# --- مجوزهای لازم برای نوشتن در مخزن ---
 permissions:
   contents: write
 
-# --- تعریف کارها ---
+# --- تعریف کارها (Jobs) ---
 jobs:
   update-proxies:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # اجرا روی آخرین نسخه اوبونتو
     steps:
-      # مرحله ۱: دریافت کد
+      # مرحله ۱: دریافت کد پروژه از مخزن
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # مرحله ۲: نصب Sing-box
-      - name: Install and Setup Sing-box
+      # مرحله ۲: نصب ابزارهای مورد نیاز
+      - name: Install Required Tools (Sing-box & Hysteria)
         run: |
-          echo "Fetching latest Sing-box version..."
-          LATEST_TAG=$(curl -s "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-          if [ -z "$LATEST_TAG" ]; then
-              echo "Failed to fetch latest tag. Exiting."
-              exit 1
-          fi
-          DOWNLOAD_URL="https://github.com/SagerNet/sing-box/releases/download/${LATEST_TAG}/sing-box-${LATEST_TAG#v}-linux-amd64.tar.gz"
-          echo "Downloading from: $DOWNLOAD_URL"
-          curl -L -o sing-box.tar.gz "$DOWNLOAD_URL"
+          # نصب Sing-box (برای تست پراکسی‌های V2Ray)
+          echo "--- Installing Sing-box ---"
+          LATEST_SING_BOX=$(curl -s "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          DOWNLOAD_URL_SB="https://github.com/SagerNet/sing-box/releases/download/${LATEST_SING_BOX}/sing-box-${LATEST_SING_BOX#v}-linux-amd64.tar.gz"
+          echo "Downloading Sing-box from: $DOWNLOAD_URL_SB"
+          curl -L -o sing-box.tar.gz "$DOWNLOAD_URL_SB"
           tar -xzf sing-box.tar.gz
           mv sing-box-*/sing-box .
           chmod +x ./sing-box
-          echo "Sing-box setup complete."
+          echo "✅ Sing-box setup complete."
 
-      # مرحله ۳: راه‌اندازی پایتون
+          # نصب Hysteria Client (برای تست پراکسی‌های Hysteria)
+          echo "--- Installing Hysteria Client ---"
+          LATEST_HYSTERIA=$(curl -s "https://api.github.com/repos/apernet/hysteria/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          DOWNLOAD_URL_HY="https://github.com/apernet/hysteria/releases/download/${LATEST_HYSTERIA}/hysteria-linux-amd64"
+          echo "Downloading Hysteria Client from: $DOWNLOAD_URL_HY"
+          curl -L -o hysteria-client "$DOWNLOAD_URL_HY"
+          chmod +x ./hysteria-client
+          echo "✅ Hysteria Client setup complete."
+
+      # مرحله ۳: راه‌اندازی محیط پایتون
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # مرحله ۴: نصب وابستگی‌ها
+      # مرحله ۴: نصب وابستگی‌های پایتون
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # مرحله ۵: اجرای اسکریپت‌ها
-      - name: Run Fetch Proxies
-        run: python -m scripts.01_fetch_proxies
+      # مرحله ۵: اجرای تمام اسکریپت‌ها به ترتیب تعریف شده
+      - name: Run Python Scripts in Sequence
+        run: |
+          echo "--- Running Fetchers ---"
+          python -m scripts.01_fetch_hysteria
+          python -m scripts.01_fetch_proxies
+          
+          echo "--- Running Testers ---"
+          python -m scripts.02_test_hysteria
+          python -m scripts.02_test_proxies
 
-      - name: Run Test Proxies
-        run: python -m scripts.02_test_proxies
+          echo "--- Running Merger ---"
+          python -m scripts.03_merge_and_sort
 
-      # مرحله ۶: کامیت و پوش کردن نتایج
+      # مرحله ۶: کامیت و پوش کردن نتایج نهایی
       - name: Commit and Push Results
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # تمام فایل‌های جدید و تغییرات در پوشه output را اضافه کن
           git add output/
-          COMMIT_MESSAGE="✅ Auto-Update: Proxy lists refreshed at $(date -u)"
-          # اگر تغییری وجود داشته باشد، کامیت کن
+          
+          COMMIT_MESSAGE="✅ Auto-Update: Merged proxy lists refreshed at $(date -u)"
+          
+          # فقط در صورتی کامیت کن که تغییری وجود داشته باشد
           if ! git diff --staged --quiet; then
             git commit -m "$COMMIT_MESSAGE"
             git push
