@@ -9,7 +9,7 @@ import random
 import string
 
 # توابع کمکی را از فایل utils وارد می‌کنیم
-from utils import get_proxies_from_file, save_proxies_to_file, save_json_to_file
+from .utils import get_proxies_from_file, save_proxies_to_file, save_json_to_file
 
 # مسیر فایل اجرایی sing-box که در ورک‌فلو دانلود می‌شود
 SING_BOX_PATH = "./sing-box"
