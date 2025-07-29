@@ -5,13 +5,13 @@ from pathlib import Path
 
 def get_proxies_from_file(path: Path) -> list[str]:
     """
-    پراکسی‌ها را از یک فایل متنی می‌خواند و خطوط خالی را نادیده می‌گیرد.
+    پراکسی‌ها را از یک فایل متنی می‌خواند و خطوط خالی و کامنت‌ها را نادیده می‌گیرد.
     """
     if not path.exists():
         return []
     with open(path, 'r', encoding='utf-8') as f:
-        # فقط خطوطی را که پس از حذف فاصله‌های اضافی، خالی نیستند، برمی‌گرداند
-        return [line.strip() for line in f if line.strip()]
+        # ✅ خطوطی که با # شروع می‌شوند نیز نادیده گرفته می‌شوند
+        return [line.strip() for line in f if line.strip() and not line.strip().startswith('#')]
 
 def save_proxies_to_file(proxies: list[str], path: Path):
     """
