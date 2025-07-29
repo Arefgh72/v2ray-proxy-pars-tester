@@ -10,7 +10,7 @@ import time
 import os
 import signal
 
-from .utils import get_proxies_from_file, save_proxies_to_file, save_json_to_file
+from utils import get_proxies_from_file, save_proxies_to_file, save_json_to_file
 
 HYSTERIA_CLIENT_PATH = "./hysteria-client"
 
