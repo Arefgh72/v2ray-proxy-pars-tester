@@ -11,7 +11,7 @@ import psutil
 # --- ایمپورت‌ها بر اساس فایل شما، با اصلاح جزئی برای پروژه ---
 from typing import List, Dict
 from collections import Counter
-from .utils import get_proxies_from_file, save_proxies_to_file, save_json_to_file
+from utils import get_proxies_from_file, save_proxies_to_file, save_json_to_file
 
 # --- تمام ثابت‌ها دقیقا از فایل شما کپی شده‌اند ---
 TEMP_DIR = 'temp_configs'
