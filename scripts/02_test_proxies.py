@@ -24,7 +24,6 @@ def test_proxy(proxy: str) -> dict:
     یک پراکسی (VLESS, VMess, etc.) را با استفاده از sing-box تست می‌کند.
     یک دیکشنری شامل اطلاعات پراکسی، وضعیت و تأخیر (delay) برمی‌گرداند.
     """
-    # برای هر تست یک فایل کانفیگ موقت با نام تصادفی ایجاد می‌کنیم
     temp_config_filename = generate_random_filename()
     config_path = Path(temp_config_filename)
 
@@ -43,10 +42,8 @@ def test_proxy(proxy: str) -> dict:
     }
 
     try:
-        # نوشتن کانفیگ در فایل موقت
         config_path.write_text(json.dumps(config), encoding='utf-8')
         
-        # دستور اجرایی برای تست پراکسی
         command = [
             SING_BOX_PATH,
             "urltest",
@@ -54,7 +51,6 @@ def test_proxy(proxy: str) -> dict:
             str(config_path)
         ]
         
-        # اجرای دستور با مهلت زمانی کلی 10 ثانیه
         proc = subprocess.run(
             command,
             timeout=10,
@@ -63,12 +59,9 @@ def test_proxy(proxy: str) -> dict:
             encoding='utf-8'
         )
 
-        # اگر دستور با موفقیت اجرا نشد، پراکسی را ناموفق در نظر بگیر
         if proc.returncode != 0:
             return {"proxy": proxy, "status": "dead", "delay": -1}
 
-        # جستجو برای پینگ در خروجی استاندارد
-        # مثال خروجی: "urltest: proxy 'vless://...' delay 123ms"
         delay_match = re.search(r"delay (\d+)ms", proc.stdout)
         
         if delay_match:
@@ -79,14 +72,11 @@ def test_proxy(proxy: str) -> dict:
             return {"proxy": proxy, "status": "dead", "delay": -1}
 
     except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
-        # اگر پراکسی در زمان مشخص پاسخ ندهد
         return {"proxy": proxy, "status": "dead", "delay": -1}
     except Exception as e:
-        # سایر خطاهای پیش‌بینی نشده
         print(f"خطای ناشناخته در تست {proxy[:40]}... : {e}")
         return {"proxy": proxy, "status": "dead", "delay": -1}
     finally:
-        # در هر صورت، فایل کانفیگ موقت را در پایان پاک می‌کنیم
         if config_path.exists():
             config_path.unlink()
 
@@ -109,7 +99,6 @@ def main():
 
     working_proxies_results = []
     
-    # اجرای موازی تست‌ها با تعداد worker بالا برای افزایش سرعت
     with ThreadPoolExecutor(max_workers=100) as executor:
         results = executor.map(test_proxy, proxies_to_test)
     
@@ -117,34 +106,20 @@ def main():
         if result["status"] == "active":
             working_proxies_results.append(result)
             
-    # مرتب‌سازی پراکسی‌های فعال بر اساس تأخیر (پینگ) از کم به زیاد
     working_proxies_results.sort(key=lambda p: p["delay"])
     
-    # استخراج رشته پراکسی‌های مرتب‌شده برای فایل‌های txt
     final_proxy_strings = [p["proxy"] for p in working_proxies_results]
     
-    # **ذخیره نتایج در فرمت‌های مختلف**
-    # ۱. فایل JSON برای استفاده در اسکریپت ادغام‌گر
+    # ذخیره نتایج در فرمت JSON برای استفاده در اسکریپت ادغام‌گر
     json_output_path = Path("output/github_results.json")
     save_json_to_file(working_proxies_results, json_output_path)
     print(f"📄 نتایج کامل (پراکسی + پینگ) در فایل {json_output_path} ذخیره شد.")
 
-    # ۲. فایل‌های متنی ساده برای استفاده مستقیم
+    # ذخیره فایل‌های متنی ساده برای استفاده مستقیم
     save_proxies_to_file(final_proxy_strings, Path("output/github_all.txt"))
     save_proxies_to_file(final_proxy_strings[:500], Path("output/github_top_500.txt"))
     save_proxies_to_file(final_proxy_strings[:100], Path("output/github_top_100.txt"))
     print("📄 لیست پراکسی‌های فعال در فایل‌های github_all.txt، github_top_500.txt و github_top_100.txt ذخیره شد.")
-
-    # چاپ خلاصه نتایج
-    summary_path = Path("output/test_summary.log")
-    summary_content = (
-        f"Total proxies fetched: {len(proxies_to_test)}\n"
-        f"Working proxies: {len(working_proxies_results)}\n"
-        f"Dead proxies: {len(proxies_to_test) - len(working_proxies_results)}\n"
-    )
-    summary_path.write_text(summary_content, encoding='utf-8')
-    print("\n--- خلاصه تست اصلی (V2Ray) ---")
-    print(summary_content)
 
 if __name__ == "__main__":
     main()
