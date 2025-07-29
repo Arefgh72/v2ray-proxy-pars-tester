@@ -1,74 +1,62 @@
-# نام ورک‌فلو
+# .github/workflows/main.yml
+
 name: Fetch, Test and Merge Proxies CI
 
-# --- تریگرها (زمان‌بندی و دستی) ---
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */3 * * *' # هر سه ساعت یک‌بار اجرا می‌شود
+    - cron: '0 */3 * * *'
 
-# --- مجوزهای لازم برای نوشتن در مخزن ---
 permissions:
   contents: write
 
-# --- تعریف کارها (Jobs) ---
 jobs:
   update-proxies:
-    runs-on: ubuntu-latest # اجرا روی آخرین نسخه اوبونتو
+    runs-on: ubuntu-latest
     steps:
-      # مرحله ۱: دریافت کد پروژه از مخزن
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # مرحله ۲: نصب ابزارهای مورد نیاز
-      - name: Install Required Tools (Sing-box & Hysteria)
+      - name: Install Tools (Sing-box & Hysteria)
         run: |
-          # نصب Sing-box (برای تست پراکسی‌های V2Ray)
-          echo "--- Installing Sing-box ---"
+          # Install Sing-box
           LATEST_SING_BOX=$(curl -s "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
           DOWNLOAD_URL_SB="https://github.com/SagerNet/sing-box/releases/download/${LATEST_SING_BOX}/sing-box-${LATEST_SING_BOX#v}-linux-amd64.tar.gz"
-          echo "Downloading Sing-box from: $DOWNLOAD_URL_SB"
           curl -L -o sing-box.tar.gz "$DOWNLOAD_URL_SB"
-          tar -xzf sing-box.tar.gz
-          mv sing-box-*/sing-box .
-          chmod +x ./sing-box
-          echo "✅ Sing-box setup complete."
-
-          # نصب Hysteria Client (برای تست پراکسی‌های Hysteria)
-          echo "--- Installing Hysteria Client ---"
+          tar -xzf sing-box.tar.gz && mv sing-box-*/sing-box . && chmod +x ./sing-box
+          # Install Hysteria Client
           LATEST_HYSTERIA=$(curl -s "https://api.github.com/repos/apernet/hysteria/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
           DOWNLOAD_URL_HY="https://github.com/apernet/hysteria/releases/download/${LATEST_HYSTERIA}/hysteria-linux-amd64"
-          echo "Downloading Hysteria Client from: $DOWNLOAD_URL_HY"
-          curl -L -o hysteria-client "$DOWNLOAD_URL_HY"
-          chmod +x ./hysteria-client
-          echo "✅ Hysteria Client setup complete."
+          curl -L -o hysteria-client "$DOWNLOAD_URL_HY" && chmod +x ./hysteria-client
 
-      # مرحله ۳: راه‌اندازی محیط پایتون
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # مرحله ۴: نصب وابستگی‌های پایتون
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt
 
-      # مرحله ۵: اجرای تمام اسکریپت‌ها به ترتیب تعریف شده
-      - name: Run Python Scripts in Sequence
+      - name: Run All Scripts
+        # ✅ اجرای مستقیم اسکریپت‌ها بدون -m، دقیقاً مطابق با منطق فایل شما
         run: |
-          echo "--- Running Fetchers ---"
-          python -m scripts.01_fetch_hysteria
-          python -m scripts.01_fetch_proxies
-          
-          echo "--- Running Testers ---"
-          python -m scripts.02_test_hysteria
-          python -m scripts.02_test_proxies
+          python scripts/01_fetch_hysteria.py
+          python scripts/01_fetch_proxies.py
+          python scripts/02_test_hysteria.py
+          python scripts/02_test_proxies.py
+          python scripts/03_merge_and_sort.py
 
-          echo "--- Running Merger ---"
-          python -m scripts.03_merge_and_sort
-
-      # مرحله ۶: کامیت و پوش کردن نتایج نهایی
       - name: Commit and Push Results
         run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git pull
+          git add output/
+          if ! git diff --staged --quiet; then
+            git commit -m "✅ Auto-Update: Proxies refreshed at $(date -u)"
+            git push
+          else
+            echo "No changes to commit."
+          fi
