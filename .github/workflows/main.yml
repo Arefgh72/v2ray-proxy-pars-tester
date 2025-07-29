@@ -72,18 +72,3 @@ jobs:
       # مرحله ۶: کامیت و پوش کردن نتایج نهایی
       - name: Commit and Push Results
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          
-          # تمام فایل‌های جدید و تغییرات در پوشه output را اضافه کن
-          git add output/
-          
-          COMMIT_MESSAGE="✅ Auto-Update: Merged proxy lists refreshed at $(date -u)"
-          
-          # فقط در صورتی کامیت کن که تغییری وجود داشته باشد
-          if ! git diff --staged --quiet; then
-            git commit -m "$COMMIT_MESSAGE"
-            git push
-          else
-            echo "No changes to commit."
-          fi
