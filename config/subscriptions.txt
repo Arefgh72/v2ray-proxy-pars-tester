@@ -1,4 +1,5 @@
 # ---------------------------------------------------
+https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray
 https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Iran.txt
 https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/non-tls
 https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/tls
