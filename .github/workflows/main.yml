@@ -7,7 +7,7 @@ on:
   schedule:
     - cron: '0 */3 * * *'
 
-# --- <<< تغییر اصلی و نهایی: اضافه کردن مجوزها >>> ---
+# --- مجوزها ---
 # این بخش به ورک‌فلو اجازه می‌دهد تا در مخزن شما کد پوش کند.
 permissions:
   contents: write
@@ -21,7 +21,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # مرحله ۲: نصب Sing-box
+      # <<< تغییر جدید: اضافه کردن مرحله بررسی IP و موقعیت مکانی >>>
+      # این مرحله IP عمومی و کشور سرور اجرایی را نمایش می‌دهد.
+      - name: Check Runner IP and Location
+        run: |
+          echo "--- Checking Runner's Public IP and Location ---"
+          IP_INFO=$(curl -s ipinfo.io)
+          RUNNER_IP=$(echo $IP_INFO | jq -r '.ip')
+          RUNNER_COUNTRY=$(echo $IP_INFO | jq -r '.country')
+          echo "✅ Runner IP Address: $RUNNER_IP"
+          echo "✅ Runner Country: $RUNNER_COUNTRY"
+          echo "------------------------------------------------"
+      
+      # مرحله ۳: نصب Sing-box
       - name: Install and Setup Sing-box
         run: |
           echo "Fetching latest Sing-box version..."
@@ -38,26 +50,26 @@ jobs:
           chmod +x ./sing-box
           echo "Sing-box setup complete."
 
-      # مرحله ۳: راه‌اندازی پایتون
+      # مرحله ۴: راه‌اندازی پایتون
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # مرحله ۴: نصب وابستگی‌ها
+      # مرحله ۵: نصب وابستگی‌ها
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # مرحله ۵: اجرای اسکریپت‌ها
+      # مرحله ۶: اجرای اسکریپت‌ها
       - name: Run Fetch Proxies
         run: python -m scripts.01_fetch_proxies
 
       - name: Run Test Proxies
         run: python -m scripts.02_test_proxies
 
-      # مرحله ۶: کامیت و پوش کردن نتایج
+      # مرحله ۷: کامیت و پوش کردن نتایج
       - name: Commit and Push Results
         run: |
           git config --global user.name 'github-actions[bot]'
