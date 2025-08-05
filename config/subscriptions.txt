@@ -51,3 +51,4 @@ https://raw.githubusercontent.com/10ium/base64-encoder/main/encoded/10ium_proxy_
 https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/hysteria2.txt
 https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/vless.txt
 https://raw.githubusercontent.com/WhiteNightlight/V2ray/v2/All.txt
+https://raw.githubusercontent.com/mheidari98/.proxy/main/all
