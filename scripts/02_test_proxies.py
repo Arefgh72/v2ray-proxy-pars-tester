@@ -6,7 +6,6 @@ import base64
 import time
 from typing import List, Tuple, Optional, Dict
 from urllib.parse import urlparse, parse_qs
-# <<< تغییر ۱: اضافه کردن Counter >>>
 from collections import Counter
 
 from .utils import log_error, log_test_summary
@@ -41,25 +40,41 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
     try:
         if proxy_link.startswith('vmess://'): return None
         parsed = urlparse(proxy_link)
-        protocol_map = {'ss': 'shadowsocks', 'vless': 'vless', 'trojan': 'trojan', 'hy': 'hysteria', 'hy2': 'hysteria2'}
+        # <<< بهبود: اضافه کردن vmess به لیست پروتکل‌های معتبر >>>
+        protocol_map = {'ss': 'shadowsocks', 'vless': 'vless', 'trojan': 'trojan', 'hy': 'hysteria', 'hy2': 'hysteria2', 'vmess': 'vmess'}
         protocol = protocol_map.get(parsed.scheme)
         if not protocol: return None
-        params = parse_qs(parsed.query)
+
         outbound_config = {"type": protocol, "tag": "proxy-out", "server": parsed.hostname, "server_port": parsed.port}
-        
-        if protocol == 'vless': 
+
+        # vmess پروتکل جدیدی است که در نسخه قبلی مدیریت نمی‌شد
+        if protocol == 'vmess':
+             # vmess پیکربندی متفاوتی دارد که اغلب در قالب JSON کد شده است
+             # از آنجایی که لینک اصلی vmess:// نادیده گرفته شده، این بخش ممکن است نیاز به توسعه بیشتر داشته باشد
+             # اگر فرمت دیگری از vmess وجود دارد
+             return None # فعلا vmess های پیچیده را رد می‌کنیم
+        elif protocol == 'vless':
             outbound_config['uuid'] = parsed.username
-        elif protocol == 'trojan': 
+        elif protocol == 'trojan':
             outbound_config['password'] = parsed.username
         elif protocol in ['hysteria', 'hysteria2']:
             outbound_config['auth'] = parsed.username
         elif protocol == 'shadowsocks':
             try:
-                decoded_user = base64.urlsafe_b64decode(parsed.username + '===').decode('utf-8')
+                # مدیریت خطا برای دیکد کردن base64
+                padding_needed = 4 - len(parsed.username) % 4
+                if padding_needed != 4:
+                    username_padded = parsed.username + '=' * padding_needed
+                else:
+                    username_padded = parsed.username
+                decoded_user = base64.urlsafe_b64decode(username_padded).decode('utf-8')
                 method, password = decoded_user.split(':', 1)
-                outbound_config['method'] = method; outbound_config['password'] = password
-            except: return None
-            
+                outbound_config['method'] = method
+                outbound_config['password'] = password
+            except (ValueError, TypeError, base64.binascii.Error):
+                 return None # اگر دیکد کردن با خطا مواجه شد، پراکسی را نادیده بگیر
+
+        params = parse_qs(parsed.query)
         VALID_TRANSPORT_TYPES = {'ws', 'grpc', 'quic'}
         transport_type = params.get('type', [None])[0]
         if transport_type and transport_type != 'tcp':
@@ -68,16 +83,18 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
             if 'host' in params: transport_config['headers'] = {'Host': params['host'][0]}
             if 'path' in params: transport_config['path'] = params['path'][0]
             outbound_config['transport'] = transport_config
-            
+
         if 'security' in params and params['security'][0] == 'tls':
             tls_config = {"enabled": True}
             if 'sni' in params: tls_config['server_name'] = params['sni'][0]
             if 'allowInsecure' in params and params['allowInsecure'][0] == '1': tls_config['insecure'] = True
             if 'transport' in outbound_config: outbound_config['transport']['tls'] = tls_config
             else: outbound_config['tls'] = tls_config
-            
+
         return outbound_config
-    except Exception: return None
+    except (ValueError, AttributeError, TypeError):
+        # این بلاک خطا هرگونه مشکل در تحلیل لینک پراکسی را مدیریت می‌کند
+        return None
 
 def create_singbox_config(outbound_config: Dict, port: int, temp_file_path: str) -> None:
     config = {
@@ -144,27 +161,47 @@ async def main_async():
     os.makedirs(TEMP_DIR, exist_ok=True)
     try:
         with open(RAW_PROXIES_FILE, 'r') as f:
-            proxies_to_test = [line.strip() for line in f if line.strip()]
+            all_lines = [line.strip() for line in f if line.strip()]
     except FileNotFoundError:
         print(f"❌ ERROR: Input file not found: '{RAW_PROXIES_FILE}'.")
         log_error("Test Proxies", f"Input file '{RAW_PROXIES_FILE}' not found.")
         return
 
-    total_proxies = len(proxies_to_test)
-    if total_proxies == 0: print("No proxies to test."); return
-    
-    # <<< تغییر ۲: شمارش پراکسی‌های ورودی بر اساس نوع >>>
-    # با استفاده از `urlparse` نوع پروتکل (scheme) هر لینک را استخراج می‌کنیم
-    input_counts = Counter(urlparse(p).scheme for p in proxies_to_test if urlparse(p).scheme)
+    # <<< تغییر اصلی: مدیریت خطا در هنگام شمارش پراکسی‌ها >>>
+    # یک لیست جدید فقط برای پراکسی‌های معتبر ایجاد می‌کنیم
+    proxies_to_test = []
+    input_counts = Counter()
+    # لیست پروتکل‌های شناخته‌شده برای اعتبارسنجی اولیه
+    known_schemes = {'ss', 'vless', 'trojan', 'hy', 'hy2', 'vmess'}
 
-    print(f"[INFO] Starting parallel test for {total_proxies} proxies with {CONCURRENT_TESTS} workers...")
+    print(f"[INFO] Parsing and validating {len(all_lines)} raw proxies...")
+    for p_line in all_lines:
+        try:
+            # تلاش برای استخراج scheme از لینک
+            scheme = urlparse(p_line).scheme
+            if scheme in known_schemes:
+                proxies_to_test.append(p_line)
+                input_counts[scheme] += 1
+            # خطوط با scheme ناشناخته یا بدون scheme نادیده گرفته می‌شوند
+        except ValueError:
+            # اگر urlparse با خطای جدی مواجه شد، آن خط را نادیده بگیر
+            if DEBUG_MODE:
+                print(f"Skipping malformed line: {p_line}")
+            continue
+
+    total_proxies = len(proxies_to_test)
+    if total_proxies == 0:
+        print("No valid proxies found to test after filtering.")
+        log_test_summary(cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0), raw_count=len(all_lines), github_stats={'passed_count': 0}, iran_stats={}, input_stats_by_type=dict(input_counts), qualified_stats_by_type={})
+        return
+
+    print(f"[INFO] Starting parallel test for {total_proxies} valid proxies with {CONCURRENT_TESTS} workers...")
 
     healthy_proxies: List[Tuple[str, int]] = []
-    
     semaphore = asyncio.Semaphore(CONCURRENT_TESTS)
     tested_count = 0
     qualified_count = 0
-    
+
     async def worker(proxy_index, proxy_link):
         nonlocal tested_count, qualified_count
         async with semaphore:
@@ -189,11 +226,12 @@ async def main_async():
         except: pass
     try: os.rmdir(TEMP_DIR)
     except: pass
-    
+
     print("\n\n📊 [SUMMARY] Test Complete.")
     print("-" * 35)
-    print(f"  Total Proxies Scanned: {total_proxies}")
-    print(f"  Total Healthy Proxies: {len(healthy_proxies)}")
+    print(f"  Total Proxies Scanned (Raw): {len(all_lines)}")
+    print(f"  Valid & Parsable Proxies: {total_proxies}")
+    print(f"  Total Healthy Proxies (Responded): {len(healthy_proxies)}")
 
     print(f"\n[INFO] Filtering healthy proxies with latency < {MAX_LATENCY_MS}ms...")
     qualified_proxies = [p for p in healthy_proxies if p[1] < MAX_LATENCY_MS]
@@ -201,30 +239,26 @@ async def main_async():
 
     if total_proxies > 0:
         success_rate = (len(qualified_proxies) / total_proxies) * 100
-        print(f"  Overall Success Rate (Qualified): {success_rate:.2f}%")
+        print(f"  Overall Success Rate (Qualified vs. Valid): {success_rate:.2f}%")
     print("-" * 35)
 
     stats = {'passed_count': 0}
-    qualified_counts = None # مقدار اولیه
+    qualified_counts = None
     if qualified_proxies:
         qualified_proxies.sort(key=lambda item: item[1])
         latencies = [item[1] for item in qualified_proxies]
         stats = {'passed_count': len(qualified_proxies), 'avg_latency': sum(latencies) / len(qualified_proxies), 'min_latency': min(latencies), 'max_latency': max(latencies)}
         sorted_proxy_links = [item[0] for item in qualified_proxies]
-        
-        # <<< تغییر ۳: شمارش پراکسی‌های سالم بر اساس نوع >>>
         qualified_counts = Counter(urlparse(p[0]).scheme for p in qualified_proxies if urlparse(p[0]).scheme)
-        
         save_results_as_base64(sorted_proxy_links)
     else:
         print("\n[INFO] No qualified proxies found. Output files will be empty.")
         save_results_as_base64([])
-    
-    # <<< تغییر ۴: ارسال آمار جدید به تابع لاگ >>>
+
     log_test_summary(
-        cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0), 
-        raw_count=total_proxies, 
-        github_stats=stats, 
+        cycle_number=os.getenv('GITHUB_RUN_NUMBER', 0),
+        raw_count=len(all_lines), # ارسال تعداد کل خطوط خوانده شده
+        github_stats=stats,
         iran_stats={},
         input_stats_by_type=dict(input_counts),
         qualified_stats_by_type=dict(qualified_counts) if qualified_counts else {}
