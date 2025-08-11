@@ -52,3 +52,12 @@ https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocol
 https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/vless.txt
 https://raw.githubusercontent.com/WhiteNightlight/V2ray/v2/All.txt
 https://raw.githubusercontent.com/mheidari98/.proxy/main/all
+https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/11.txt
+https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/10.txt
+https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/1.txt
+https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/12.txt
+https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/13.txt
+https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/2.txt
+https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/15.txt
+https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/17.txt
+https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/6.txt
