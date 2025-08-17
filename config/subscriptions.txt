@@ -61,3 +61,7 @@ https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/
 https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/15.txt
 https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/17.txt
 https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/main/githubmirror/6.txt
+https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/detailed/vless/8880.txt
+https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/vless.txt
+https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/ss.txt
+https://shadowmere.xyz/api/b64sub/
