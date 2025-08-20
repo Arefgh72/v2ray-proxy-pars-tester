@@ -65,3 +65,4 @@ https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/detail
 https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/vless.txt
 https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/ss.txt
 https://shadowmere.xyz/api/b64sub/
+https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/all_extracted_configs.txt
