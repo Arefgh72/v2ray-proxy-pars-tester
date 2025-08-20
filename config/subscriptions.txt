@@ -67,3 +67,4 @@ https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/ss
 https://shadowmere.xyz/api/b64sub/
 https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/all_extracted_configs.txt
 https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/vless_configs.txt
+https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/refs/heads/main/V2Ray-Config-By-EbraSha-All-Type.txt
