@@ -69,3 +69,7 @@ https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/all_extrac
 https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/vless_configs.txt
 https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/main/V2Ray-Config-By-EbraSha-All-Type.txt
 https://raw.githubusercontent.com/ShatakVPN/ConfigForge/main/configs/all.txt
+https://v2.alicivil.workers.dev
+https://raw.githubusercontent.com/aqayerez/MatnOfficial-VPN/main/MatnOfficial#MatnOfficial
+https://raw.githubusercontent.com/darkvpnapp/CloudflarePlus/main/proxy
+https://raw.githubusercontent.com/darkvpnapp/CloudflarePlus/main/proxy
