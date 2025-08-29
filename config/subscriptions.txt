@@ -73,3 +73,6 @@ https://v2.alicivil.workers.dev
 https://raw.githubusercontent.com/aqayerez/MatnOfficial-VPN/main/MatnOfficial#MatnOfficial
 https://raw.githubusercontent.com/darkvpnapp/CloudflarePlus/main/proxy
 https://raw.githubusercontent.com/darkvpnapp/CloudflarePlus/main/proxy
+https://raw.githubusercontent.com/mermeroo/V2RAY-CLASH-SUB64-Subscription.Links/refs/heads/main/SUB%20LINKS
+https://1oi.xyz/proxies/v2ray/location/DE
+https://1oi.xyz/proxies/v2ray/location/NL
