@@ -80,3 +80,4 @@ https://raw.githubusercontent.com/Farid-Karimi/Config-Collector/main/vless_iran.
 https://raw.githubusercontent.com/Farid-Karimi/Config-Collector/main/ss_iran.txt
 https://raw.githubusercontent.com/AliDev-ir/FreeVPN/main/pcvpn
 https://raw.githubusercontent.com/hamedp-71/Sub_Checker_Creator/main/final.txt
+https://raw.githubusercontent.com/ShatakVPN/ConfigForge-V2Ray/main/configs/vless.txt
