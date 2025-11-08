@@ -74,6 +74,8 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          # --- <<< اضافه شدن دستور git pull برای همگام‌سازی >>> ---
+          git pull
           git add output/
           COMMIT_MESSAGE="✅ Auto-Update: Proxy lists refreshed at $(date -u)"
           # اگر تغییری وجود داشته باشد، کامیت کن
