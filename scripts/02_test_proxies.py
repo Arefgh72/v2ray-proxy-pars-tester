@@ -69,11 +69,16 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
                     "alter_id": vmess_config.get('aid', 0)
                 })
 
-                # 3. مدیریت تنظیمات Transport
+                # 3. مدیریت تنظیمات Transport (بهبود یافته)
                 net = vmess_config.get('net', 'tcp')
                 if net != 'tcp':
                     transport_config = {"type": net}
-                    if 'path' in vmess_config: transport_config['path'] = vmess_config.get('path')
+                    # مدیریت GRPC ServiceName
+                    if net == 'grpc' and 'path' in vmess_config:
+                        transport_config['service_name'] = vmess_config.get('path')
+                    elif 'path' in vmess_config:
+                        transport_config['path'] = vmess_config.get('path')
+
                     if 'host' in vmess_config and vmess_config.get('host'):
                         transport_config.setdefault('headers', {})['Host'] = vmess_config.get('host')
                     outbound_config['transport'] = transport_config
@@ -106,8 +111,16 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
         elif protocol == 'hysteria':
             outbound_config['auth'] = parsed.username
         elif protocol == 'hysteria2':
-            # sing-box uses 'password' for hy2, not 'auth'
             outbound_config['password'] = parsed.username
+            # --- <<< اضافه شدن منطق برای OBFS >>> ---
+            params = parse_qs(parsed.query)
+            if 'obfs' in params and params.get('obfs', [None])[0] == 'salamander':
+                obfs_password = params.get('obfs-password', [None])[0]
+                if obfs_password:
+                    outbound_config['obfs'] = {
+                        "type": "salamander",
+                        "password": obfs_password
+                    }
         elif protocol == 'shadowsocks':
             try:
                 # مدیریت خطا برای دیکد کردن base64
@@ -133,19 +146,26 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
             if 'path' in params: transport_config['path'] = params['path'][0]
             outbound_config['transport'] = transport_config
 
-        # --- مدیریت TLS ---
-        # Hysteria/2 به صورت ضمنی از TLS استفاده می‌کند اگر SNI وجود داشته باشد
-        is_hysteria_protocol = protocol in ['hysteria', 'hysteria2']
-        has_security_tls = 'security' in params and params['security'][0] == 'tls'
+        # --- مدیریت TLS (اصلاح شده) ---
+        has_security_tls = 'security' in params and params.get('security', [None])[0] == 'tls'
 
-        if (is_hysteria_protocol and 'sni' in params) or has_security_tls:
+        # Hysteria/2 همیشه به یک شیء TLS نیاز دارد
+        if protocol in ['hysteria', 'hysteria2']:
             tls_config = {"enabled": True}
             if 'sni' in params:
-                tls_config['server_name'] = params['sni'][0]
-            if 'allowInsecure' in params and params['allowInsecure'][0] == '1':
+                tls_config['server_name'] = params.get('sni', [None])[0]
+            if params.get('allowInsecure', ['0'])[0] == '1':
+                tls_config['insecure'] = True
+            outbound_config['tls'] = tls_config
+
+        # برای پروتکل‌های دیگر
+        elif has_security_tls:
+            tls_config = {"enabled": True}
+            if 'sni' in params:
+                tls_config['server_name'] = params.get('sni', [None])[0]
+            if params.get('allowInsecure', ['0'])[0] == '1':
                 tls_config['insecure'] = True
 
-            # برای Hysteria، تنظیمات TLS در سطح بالا قرار دارد
             if 'transport' in outbound_config:
                 outbound_config['transport']['tls'] = tls_config
             else:
@@ -177,7 +197,8 @@ async def test_single_proxy_async(proxy_index: int, proxy_link: str) -> Optional
         singbox_process = await asyncio.create_subprocess_exec(*cmd_run, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
         await asyncio.sleep(0.5)
         proxy_address = f"socks5h://127.0.0.1:{port}"
-        cmd_curl = ['curl', '--proxy', proxy_address, '--connect-timeout', '5', '-m', '8', '--head', '--silent', '--output', '/dev/null', '--write-out', '%{time_total}', TEST_URL]
+        # --- <<< افزایش Timeoutها >>> ---
+        cmd_curl = ['curl', '--proxy', proxy_address, '--connect-timeout', '7', '-m', '12', '--head', '--silent', '--output', '/dev/null', '--write-out', '%{time_total}', TEST_URL]
         proc_curl = await asyncio.create_subprocess_exec(*cmd_curl, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
         stdout, _ = await proc_curl.communicate()
         if proc_curl.returncode == 0 and stdout:
