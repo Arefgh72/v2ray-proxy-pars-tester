@@ -10,7 +10,6 @@ This project uses a GitHub Action that runs automatically at scheduled intervals
 
 1.  **Fetch:** It fetches proxy configurations from a list of public V2Ray subscription links.
 2.  **Test (Global):** It performs an initial test on all collected proxies from GitHub's servers (located in the US/Europe). This filters out dead or unreachable proxies.
-3.  **Test (Iran-Optimized):** (Coming Soon) (It is inactive) It will send the working proxies to a dedicated server inside Iran to perform real-world latency and speed tests.
 4.  **Sort & Publish:** It sorts the proxies based on performance and publishes them into several subscription links, ready for you to use.
 
 ---
@@ -21,7 +20,7 @@ Here are the final subscription links. Simply copy the URL you want and add it t
 
 ### 🌍 GitHub-Tested Proxies (Globally Accessible)
 
-These proxies are tested from GitHub's international servers. They are generally working but may not be optimized for users inside Iran.
+These proxies are tested from GitHub's international servers. They are generally working but may not be optimized for users
 
 *   **All Active Proxies (GitHub)**
     *   Contains **all** proxies that passed the initial global test.
