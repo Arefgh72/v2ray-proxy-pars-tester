@@ -38,27 +38,76 @@ def check_singbox_executable() -> bool:
 
 def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
     try:
-        if proxy_link.startswith('vmess://'): return None
+        # --- آماده‌سازی برای پذیرش پراکسی‌های جدید ---
+        if proxy_link.startswith('vmess://'):
+            # منطق vmess در مرحله بعد اضافه خواهد شد
+            pass # فعلا اجازه عبور می‌دهیم
+
         parsed = urlparse(proxy_link)
-        # <<< بهبود: اضافه کردن vmess به لیست پروتکل‌های معتبر >>>
         protocol_map = {'ss': 'shadowsocks', 'vless': 'vless', 'trojan': 'trojan', 'hy': 'hysteria', 'hy2': 'hysteria2', 'vmess': 'vmess'}
         protocol = protocol_map.get(parsed.scheme)
         if not protocol: return None
 
-        outbound_config = {"type": protocol, "tag": "proxy-out", "server": parsed.hostname, "server_port": parsed.port}
+        outbound_config = {"type": protocol, "tag": "proxy-out"}
 
-        # vmess پروتکل جدیدی است که در نسخه قبلی مدیریت نمی‌شد
-        if protocol == 'vmess':
-             # vmess پیکربندی متفاوتی دارد که اغلب در قالب JSON کد شده است
-             # از آنجایی که لینک اصلی vmess:// نادیده گرفته شده، این بخش ممکن است نیاز به توسعه بیشتر داشته باشد
-             # اگر فرمت دیگری از vmess وجود دارد
-             return None # فعلا vmess های پیچیده را رد می‌کنیم
-        elif protocol == 'vless':
+        # --- <<< اضافه شدن منطق کامل برای VMess >>> ---
+        if proxy_link.startswith('vmess://'):
+            try:
+                # 1. استخراج و رمزگشایی بخش Base64
+                base64_part = proxy_link.replace('vmess://', '').strip()
+                padding_needed = 4 - len(base64_part) % 4
+                if padding_needed != 4: base64_part += '=' * padding_needed
+                decoded_json = base64.b64decode(base64_part).decode('utf-8')
+                vmess_config = json.loads(decoded_json)
+
+                # 2. ساخت کانفیگ خروجی برای sing-box
+                outbound_config.update({
+                    "server": vmess_config.get('add'),
+                    "server_port": int(vmess_config.get('port', 0)),
+                    "uuid": vmess_config.get('id'),
+                    "security": vmess_config.get('scy', 'auto'),
+                    "alter_id": vmess_config.get('aid', 0)
+                })
+
+                # 3. مدیریت تنظیمات Transport
+                net = vmess_config.get('net', 'tcp')
+                if net != 'tcp':
+                    transport_config = {"type": net}
+                    if 'path' in vmess_config: transport_config['path'] = vmess_config.get('path')
+                    if 'host' in vmess_config and vmess_config.get('host'):
+                        transport_config.setdefault('headers', {})['Host'] = vmess_config.get('host')
+                    outbound_config['transport'] = transport_config
+
+                # 4. مدیریت تنظیمات TLS
+                if vmess_config.get('tls', '') in ('tls', 'tls-insecure'):
+                    tls_config = {"enabled": True}
+                    if 'sni' in vmess_config and vmess_config.get('sni'):
+                        tls_config['server_name'] = vmess_config.get('sni')
+                    if vmess_config.get('tls') == 'tls-insecure':
+                        tls_config['insecure'] = True
+
+                    if 'transport' in outbound_config:
+                        outbound_config['transport']['tls'] = tls_config
+                    else:
+                        outbound_config['tls'] = tls_config
+
+                return outbound_config # کانفیگ vmess با موفقیت ساخته شد
+
+            except Exception:
+                return None # در صورت بروز خطا در تحلیل لینک vmess، آن را نادیده بگیر
+
+        # --- مدیریت پروتکل‌های دیگر ---
+        outbound_config.update({"server": parsed.hostname, "server_port": parsed.port})
+
+        if protocol == 'vless':
             outbound_config['uuid'] = parsed.username
         elif protocol == 'trojan':
             outbound_config['password'] = parsed.username
-        elif protocol in ['hysteria', 'hysteria2']:
+        elif protocol == 'hysteria':
             outbound_config['auth'] = parsed.username
+        elif protocol == 'hysteria2':
+            # sing-box uses 'password' for hy2, not 'auth'
+            outbound_config['password'] = parsed.username
         elif protocol == 'shadowsocks':
             try:
                 # مدیریت خطا برای دیکد کردن base64
@@ -84,12 +133,23 @@ def parse_proxy_link(proxy_link: str) -> Optional[Dict]:
             if 'path' in params: transport_config['path'] = params['path'][0]
             outbound_config['transport'] = transport_config
 
-        if 'security' in params and params['security'][0] == 'tls':
+        # --- مدیریت TLS ---
+        # Hysteria/2 به صورت ضمنی از TLS استفاده می‌کند اگر SNI وجود داشته باشد
+        is_hysteria_protocol = protocol in ['hysteria', 'hysteria2']
+        has_security_tls = 'security' in params and params['security'][0] == 'tls'
+
+        if (is_hysteria_protocol and 'sni' in params) or has_security_tls:
             tls_config = {"enabled": True}
-            if 'sni' in params: tls_config['server_name'] = params['sni'][0]
-            if 'allowInsecure' in params and params['allowInsecure'][0] == '1': tls_config['insecure'] = True
-            if 'transport' in outbound_config: outbound_config['transport']['tls'] = tls_config
-            else: outbound_config['tls'] = tls_config
+            if 'sni' in params:
+                tls_config['server_name'] = params['sni'][0]
+            if 'allowInsecure' in params and params['allowInsecure'][0] == '1':
+                tls_config['insecure'] = True
+
+            # برای Hysteria، تنظیمات TLS در سطح بالا قرار دارد
+            if 'transport' in outbound_config:
+                outbound_config['transport']['tls'] = tls_config
+            else:
+                outbound_config['tls'] = tls_config
 
         return outbound_config
     except (ValueError, AttributeError, TypeError):
@@ -171,7 +231,7 @@ async def main_async():
     # یک لیست جدید فقط برای پراکسی‌های معتبر ایجاد می‌کنیم
     proxies_to_test = []
     input_counts = Counter()
-    # لیست پروتکل‌های شناخته‌شده برای اعتبارسنجی اولیه
+    # <<< به‌روزرسانی: اضافه کردن vmess به لیست پروتکل‌های شناخته‌شده >>>
     known_schemes = {'ss', 'vless', 'trojan', 'hy', 'hy2', 'vmess'}
 
     print(f"[INFO] Parsing and validating {len(all_lines)} raw proxies...")
