@@ -85,3 +85,4 @@ https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Vless.txt
 https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/ShadowSocksR.txt
 https://raw.githubusercontent.com/Danialsamadi/v2go/main/Splitted-By-Protocol/vless.txt
 https://raw.githubusercontent.com/miladtahanian/V2RayCFGDumper/main/config.txt
+https://raw.githubusercontent.com/snakem982/proxypool/main/source/v2ray-2.txt
