@@ -26039,3 +26039,24 @@
 [2026-01-03 09:11:50] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/vless.txt]
   Details: HTTP Error 404: 
 ------------------------------------------------------------
+[2026-01-03 12:21:07] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/non-tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-03 12:21:07] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-03 12:21:07] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-03 12:21:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-03 12:21:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/subscribe/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-03 12:21:16] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/hysteria2.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-03 12:21:16] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
