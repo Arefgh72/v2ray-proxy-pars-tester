@@ -27923,3 +27923,30 @@
 [2026-01-13 09:19:44] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://v2.alicivil.workers.dev]
   Details: HTTP Error 500: 
 ------------------------------------------------------------
+[2026-01-13 12:26:12] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/non-tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-13 12:26:12] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-13 12:26:12] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-13 12:26:13] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-13 12:26:13] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/subscribe/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-13 12:26:15] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: http://yalda.nscl.ir]
+  Details: Failed to perform, curl: (7) Failed to connect to yalda.nscl.ir port 80 after 2001 ms: Could not connect to server. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-01-13 12:26:17] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/hysteria2.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-13 12:26:17] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-01-13 12:26:19] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://v2.alicivil.workers.dev]
+  Details: HTTP Error 500: 
+------------------------------------------------------------
