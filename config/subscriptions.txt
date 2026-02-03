@@ -109,3 +109,5 @@ https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/vl
 https://raw.githubusercontent.com/nscl5/5/refs/heads/main/configs/all.txt
 https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/ss.txt
 https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/sub.txt
+https://info.farsonline24.ir/
+https://manager.farsonline24.ir/
