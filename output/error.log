@@ -35387,3 +35387,39 @@
 [2026-02-17 12:38:04] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://info.farsonline24.ir/]
   Details: HTTP Error 502: 
 ------------------------------------------------------------
+[2026-02-17 14:18:30] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/non-tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-02-17 14:18:30] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-02-17 14:18:30] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-02-17 14:18:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-02-17 14:18:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/mshojaei77/v2rayAuto/refs/heads/main/subs/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-02-17 14:18:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/mshojaei77/v2rayAuto/refs/heads/main/subs/hy2]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-02-17 14:18:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/subscribe/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-02-17 14:19:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/de/mixed]
+  Details: Failed to perform, curl: (28) Operation timed out after 30002 milliseconds with 0 bytes received. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-02-17 14:19:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/hysteria2.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-02-17 14:19:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-02-17 14:19:13] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://shadowmere.xyz/api/b64sub/]
+  Details: HTTP Error 403: 
+------------------------------------------------------------
+[2026-02-17 14:19:34] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://info.farsonline24.ir/]
+  Details: HTTP Error 502: 
+------------------------------------------------------------
