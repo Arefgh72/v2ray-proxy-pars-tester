@@ -116,3 +116,4 @@ https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/Vless-Real
 https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/WHITE-CIDR-RU-checked.txt
 https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/WHITE-SNI-RU-all.txt
 https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_SS+All_RUS.txt
+https://github.com/Delta-Kronecker/V2ray-Config/raw/main/config/all_configs.txt
