@@ -41969,3 +41969,48 @@
 [2026-03-11 04:27:52] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://manager.farsonline24.ir/]
   Details: HTTP Error 521: 
 ------------------------------------------------------------
+[2026-03-11 06:38:46] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/non-tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:38:46] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:38:46] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:38:48] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:38:48] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/mshojaei77/v2rayAuto/refs/heads/main/subs/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:38:48] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/mshojaei77/v2rayAuto/refs/heads/main/subs/hy2]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:38:48] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/subscribe/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:38:53] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/hysteria2.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:38:53] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:38:56] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://shadowmere.xyz/api/b64sub/]
+  Details: HTTP Error 403: 
+------------------------------------------------------------
+[2026-03-11 06:39:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://1oi.xyz/proxies/v2ray/location/DE]
+  Details: Failed to perform, curl: (28) Connection timed out after 30002 milliseconds. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-03-11 06:40:01] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://1oi.xyz/proxies/v2ray/location/NL]
+  Details: Failed to perform, curl: (28) Connection timed out after 30002 milliseconds. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-03-11 06:40:02] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/miladtahanian/V2RayCFGDumper/main/config.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-03-11 06:40:06] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://info.farsonline24.ir/]
+  Details: HTTP Error 521: 
+------------------------------------------------------------
+[2026-03-11 06:40:07] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://manager.farsonline24.ir/]
+  Details: HTTP Error 521: 
+------------------------------------------------------------
