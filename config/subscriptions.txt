@@ -117,3 +117,8 @@ https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/WHITE-CIDR
 https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/WHITE-SNI-RU-all.txt
 https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_SS+All_RUS.txt
 https://github.com/Delta-Kronecker/V2ray-Config/raw/main/config/all_configs.txt
+https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity
+https://raw.githubusercontent.com/mahdibland/SSAggregator/master/sub/airport_merge_base64.txt
+https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/splitted/ss.txt
+https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/splitted/vmess.txt
+https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/splitted/ssr.txt
