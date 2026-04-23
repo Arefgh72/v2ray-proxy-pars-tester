@@ -122,4 +122,4 @@ https://raw.githubusercontent.com/mahdibland/SSAggregator/master/sub/airport_mer
 https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/splitted/ss.txt
 https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/splitted/vmess.txt
 https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/splitted/ssr.txt
-https://github.com/Arianlavi/RebeldevConfig/blob/main/RebelLink/all_subscriptions.txt
+https://raw.githubusercontent.com/Arianlavi/RebeldevConfig/main/RebelLink/all_subscriptions.txt
