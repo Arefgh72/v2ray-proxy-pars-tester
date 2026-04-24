@@ -123,3 +123,6 @@ https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/sp
 https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/splitted/vmess.txt
 https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/splitted/ssr.txt
 https://raw.githubusercontent.com/Arianlavi/RebeldevConfig/main/RebelLink/all_subscriptions.txt
+https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/ShadowSocks.txt
+https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Vmess.txt
+https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Vless.txt
