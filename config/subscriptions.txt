@@ -230,3 +230,4 @@ https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/ShadowSock
 https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Vmess.txt
 https://raw.githubusercontent.com/Argh94/V2RayAutoConfig/main/configs/Vless.txt
 https://raw.githubusercontent.com/10ium/base64-encoder/main/encoded/10ium_proxy_configs.txt
+https://raw.githubusercontent.com/sinavm/SVM/main/subscriptions/xray/base64/mix
