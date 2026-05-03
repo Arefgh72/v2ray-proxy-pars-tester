@@ -47607,3 +47607,23 @@ Total Raw Proxies Fetched: 231202
   - Iran test was not run or no proxies passed.
 ====================================================================
 
+================== Cycle #2540 | 2026-05-03 08:21:46 ==================
+Total Raw Proxies Fetched: 225463
+
+[ GitHub Test Summary ]
+  - Proxies Passed (Qualified): 7945
+  - Average Latency: 996.87 ms
+  - Min Latency: 208 ms
+  - Max Latency: 1999 ms
+
+[ Breakdown by Protocol ]
+  - HY2      | Input: 127   -> Qualified: 0     (0.0%)
+  - SS       | Input: 61996 -> Qualified: 5692  (9.2%)
+  - TROJAN   | Input: 18031 -> Qualified: 9     (0.0%)
+  - VLESS    | Input: 127366 -> Qualified: 2181  (1.7%)
+  - VMESS    | Input: 17561 -> Qualified: 63    (0.4%)
+
+[ Iran Test Summary ]
+  - Iran test was not run or no proxies passed.
+====================================================================
+
