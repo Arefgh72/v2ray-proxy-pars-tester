@@ -31,3 +31,6 @@ sing-box-*/
 # این موارد مربوط به تنظیمات شخصی شما هستند.
 .vscode/
 .idea/
+
+
+output/raw_proxies.txt
