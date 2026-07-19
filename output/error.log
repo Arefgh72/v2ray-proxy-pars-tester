@@ -142466,3 +142466,174 @@
 [2026-07-18 21:40:20] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/Vless-Reality-White-Lists-Rus-Mobile-2.txt]
   Details: HTTP Error 404: 
 ------------------------------------------------------------
+[2026-07-19 01:42:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://drive.google.com/uc?export=download&id=10DzWaY72cBTD0ygQrnI0bulEtiUqyevGTelegram || @DarkVPNpro1.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://drive.google.com/uc?export=download&id=1V9DuDgkDGzQRHO_qWwMkS_KNSJM6UbnJ || @DarkVPNpro2.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://ivuxy.tech/v.txt || ivuxy.tech.txt]
+  Details: Failed to perform, curl: (6) Could not resolve host: ivuxy.tech. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-07-19 01:42:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/darkvpnapp/CloudflarePlus/refs/heads/main/proxy || darkvpnapp_CloudflarePlus_proxy]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/Freedom-Guard-Builder/Freedom-Finder/refs/heads/main/out/configs.txt || Freedom-Guard_Finder_configs]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/refs/heads/main/ssr_configs.txt || ebrasha_ssr]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/refs/heads/main/V2Ray-Config-By-EbraSha.txt || ebrasha_lite]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://karing-freevpnhomes-subscription.shampoosirsehat.homes || freevpnhomes.txt]
+  Details: Failed to perform, curl: (3) URL rejected: Bad hostname. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-07-19 01:42:09] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/10ium/ScrapeAndCategorize/refs/heads/main/output_configs/Turkey.txt || 10ium-ScrapeAndCategorizeTurkey.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/10ium/V2rayCollector/main/mixed_iran.txt || 10ium-V2rayCollector-mixed]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/10ium/V2rayCollector/main/ss_iran.txt || 10ium-V2rayCollector-ss]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/10ium/V2rayCollector/main/trojan_iran.txt || 10ium-V2rayCollector-trojan]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/10ium/V2rayCollector/main/vless_iran.txt || 10ium-V2rayCollector-vless]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/10ium/V2rayCollector/main/vmess_iran.txt || 10ium-V2rayCollector-vmess]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:10] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/AzadNetCH/temp/refs/heads/main/KR.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:11] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/Epodonios/bulk-xray-v2ray-vless-vmess-...-configs/refs/heads/main/sub/Turkey/config.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:11] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/MahsaNetConfigTopic/config/refs/heads/main/xray_final.txt || MahsaNetConfigTopic]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:12] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/ShadowSocksM/V2ray/refs/heads/main/ShadowM-MCI-Irancell.txt || ShadowM-MCI-Irancell.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:12] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/ShadowSocksM/V2ray/refs/heads/main/ShadowSocksM-MR.txt || ShadowSocksM-MR.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:12] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/ShadowSocksM/V2ray/refs/heads/main/ShadowSocksM-Singbox.txt || ShadowSocksM-Singbox.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:12] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/ShadowSocksM/V2ray/refs/heads/main/ShadowsocksM-MCI-Wifi.txt || ShadowsocksM-MCI-Wifi.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:13] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/amirparsaxs/Javid-shah/refs/heads/main/Sub.text || amirparsaxs@xsfilternet.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:14] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/iPsycho1/Subscription/refs/heads/main/iPsycho]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:14] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/iPsycho1/Subscription/refs/heads/main/iPsycho_Test-Config]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:14] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/miladtahanian/V2RayCFGDumper/refs/heads/main/config.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://shz.al/pTD5 || @proxy_kafee.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://shz.al/rKMx || @v2ray_hidify.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://shz.al/~@FREE2CONFIG_Vless || @FREE2CONFIG_Vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/Created-By/Telegram-Eag1e_YT/refs/heads/main/%40Eag1e_YT || Telegram_Eag1e_YT]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/arshiacomplus/robinhood-v1-v2-v3ray/refs/heads/main/conf.txt || arshiacomplus_robinhood]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/arshiacomplus/WoW-fix/refs/heads/main/subwarp/warp ||arshiacomplus_WoW-fix]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:31] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/mix/sub.html || arshiacomplus_v2rayExtractor_mix]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/vless.html || arshiacomplus_v2rayExtractor_vless]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/vmess.html || arshiacomplus_v2rayExtractor_vmess]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/trojan.html || arshiacomplus_v2rayExtractor_trojan]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:42:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/ss.html || arshiacomplus_v2rayExtractor_ss]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:02] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://sub.amiralter.com/config || amiralter_config]
+  Details: Failed to perform, curl: (28) Connection timed out after 30002 milliseconds. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-07-19 01:43:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://sub.amiralter.com/config-lite || amiralter_config_lite]
+  Details: Failed to perform, curl: (28) Connection timed out after 30002 milliseconds. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-07-19 01:43:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/parvinxs/Submahsanetxsparvin/refs/heads/main/Sub.mahsa.xsparvin || parvinxs_Sub_mahsa_xsparvin]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/Mahdi0024/ProxyCollector/refs/heads/master/sub/proxies.txt || Mahdi0024_ProxyCollector]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/Farid-Karimi/Config-Collector/main/mixed_iran.txt || Farid-Karimi_Config-Collector]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/non-tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/security/tls]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:32] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/PlanAsli/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:33] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:33] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/mshojaei77/v2rayAuto/refs/heads/main/subs/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:33] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/mshojaei77/v2rayAuto/refs/heads/main/subs/hy2]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:33] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/subscribe/protocols/hysteria]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:38] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/hysteria2.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:38] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/eQnz/configs-collector-v2ray/main/sub/protocols/vless.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:42] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://shadowmere.xyz/api/b64sub/]
+  Details: HTTP Error 403: 
+------------------------------------------------------------
+[2026-07-19 01:43:48] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://1oi.xyz/proxies/v2ray/location/DE]
+  Details: Failed to perform, curl: (6) Could not resolve host: 1oi.xyz. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-07-19 01:43:48] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://1oi.xyz/proxies/v2ray/location/NL]
+  Details: Failed to perform, curl: (6) Could not resolve host: 1oi.xyz. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-07-19 01:43:49] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/miladtahanian/V2RayCFGDumper/main/config.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
+[2026-07-19 01:43:54] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://info.farsonline24.ir/]
+  Details: Failed to perform, curl: (6) Could not resolve host: info.farsonline24.ir. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-07-19 01:43:54] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://manager.farsonline24.ir/]
+  Details: Failed to perform, curl: (6) Could not resolve host: manager.farsonline24.ir. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
+------------------------------------------------------------
+[2026-07-19 01:43:54] [Stage: Fetch Proxies (Network)] [Error: Failed to fetch from link: https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/Vless-Reality-White-Lists-Rus-Mobile-2.txt]
+  Details: HTTP Error 404: 
+------------------------------------------------------------
